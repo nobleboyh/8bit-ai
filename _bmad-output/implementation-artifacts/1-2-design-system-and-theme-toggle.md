@@ -1,6 +1,6 @@
 # Story 1.2: Design System & Theme Toggle
 
-Status: review
+Status: done
 
 ## Story
 

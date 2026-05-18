@@ -1,6 +1,6 @@
 # Story 1.4: Layout Shell, Control Panel & Viewer Shell
 
-Status: review
+Status: done
 
 ## Story
 

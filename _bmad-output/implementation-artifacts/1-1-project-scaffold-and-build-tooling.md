@@ -1,6 +1,6 @@
 # Story 1.1: Project Scaffold & Build Tooling
 
-Status: review
+Status: done
 
 ## Story
 

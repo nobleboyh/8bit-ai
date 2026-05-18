@@ -1,6 +1,6 @@
 # Story 1.3: API Key Input & Provider Configuration
 
-Status: review
+Status: done
 
 ## Story
 
