@@ -45,10 +45,17 @@ export function useProviderConfig() {
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    return () => {
-      if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    try {
+      localStorage.setItem(STORAGE_KEYS.provider, providerType)
+      localStorage.setItem(STORAGE_KEYS.apiUrl, apiUrl)
+      localStorage.setItem(STORAGE_KEYS.model, model)
+    } catch {
+      // localStorage may be full or unavailable
     }
-  }, [])
+    setSavedNotice(true)
+    if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    noticeTimer.current = setTimeout(() => setSavedNotice(false), 3000)
+  }, [providerType, apiUrl, model])
 
   const handleProviderChange = useCallback(
     (type: LLMProviderType) => {

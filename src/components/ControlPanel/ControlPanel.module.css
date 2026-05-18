@@ -87,6 +87,13 @@
   outline-offset: 2px;
 }
 
+.chipSelected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+  background-clip: padding-box;
+}
+
 @media (max-width: 600px) {
   .generateRow {
     flex-direction: column;

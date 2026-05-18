@@ -9,6 +9,8 @@ describe('ControlPanel', () => {
     onGenerate: vi.fn(),
     isGenerating: false,
     hasApiKey: true,
+    selectedType: 'Wizard',
+    onTypeSelect: vi.fn(),
   }
 
   it('renders textarea, FORGE button, and 6 chips', () => {
@@ -39,13 +41,21 @@ describe('ControlPanel', () => {
     expect(screen.getByLabelText('Generate avatar')).toBeDisabled()
   })
 
-  it('clicking chip fills textarea', () => {
+  it('clicking chip fills textarea and selects type', () => {
     const onPromptChange = vi.fn()
-    render(<ControlPanel {...defaultProps} onPromptChange={onPromptChange} />)
-    const wizardChip = screen.getByLabelText('Wizard preset')
-    fireEvent.click(wizardChip)
+    const onTypeSelect = vi.fn()
+    render(<ControlPanel {...defaultProps} onPromptChange={onPromptChange} onTypeSelect={onTypeSelect} />)
+    const robotChip = screen.getByLabelText('Robot preset')
+    fireEvent.click(robotChip)
+    expect(onTypeSelect).toHaveBeenCalledWith('Robot')
     expect(onPromptChange).toHaveBeenCalled()
-    expect(onPromptChange.mock.calls[0][0]).toContain('wizard')
+    expect(onPromptChange.mock.calls[0][0]).toContain('chrome')
+  })
+
+  it('selected type chip has selected class', () => {
+    render(<ControlPanel {...defaultProps} selectedType="Knight" />)
+    const knightChip = screen.getByLabelText('Knight preset')
+    expect(knightChip.className).toContain('chipSelected')
   })
 
   it('calls onGenerate on FORGE click', () => {

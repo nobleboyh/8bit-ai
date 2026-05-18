@@ -9,6 +9,7 @@
   justify-content: center;
   gap: 14px;
   image-rendering: pixelated;
+  padding: 24px;
 }
 
 .icon {
@@ -23,6 +24,33 @@
   color: var(--muted);
   text-align: center;
   padding: 0 24px;
+}
+
+.actionRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn {
+  padding: 14px 20px;
+  border: 3px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 9px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
 }
 
 @media (max-width: 600px) {

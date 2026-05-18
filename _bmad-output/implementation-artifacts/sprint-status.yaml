@@ -14,10 +14,13 @@ status: in-progress
 
 development_status:
   epic-1: done
-  epic-2: backlog
+  epic-2: review
   1-1-project-scaffold-and-build-tooling: done
   1-2-design-system-and-theme-toggle: done
   1-3-api-key-input-and-provider-configuration: done
   1-4-layout-shell-control-panel-and-viewer-shell: done
+  2-1-llm-provider-abstraction-layer: review
+  2-2-pixel-generation-flow-and-state-management: review
+  2-3-avatar-rendering-loading-indicator-and-png-export: review
 
 last_updated: 2026-05-18

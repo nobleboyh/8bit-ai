@@ -1,13 +1,60 @@
+import type { PixelMapResponse } from '@/types/pixelmap'
+import { ErrorDisplay } from '@/components/ErrorDisplay/ErrorDisplay'
+import { AvatarGrid } from '@/components/AvatarGrid/AvatarGrid'
+import { LoadingIndicator } from '@/components/LoadingIndicator/LoadingIndicator'
+import { DownloadButton } from '@/components/DownloadButton/DownloadButton'
 import styles from './ViewerShell.module.css'
 
 export type ViewerState = 'empty' | 'loading' | 'result' | 'error'
 
 interface ViewerShellProps {
   state: ViewerState
+  pixelMap?: PixelMapResponse | null
+  isGenerating?: boolean
+  error?: string | null
+  selectedType?: string
+  prompt?: string
+  onReForge?: () => void
 }
 
-export function ViewerShell({ state }: ViewerShellProps) {
-  if (state !== 'empty') return null
+export function ViewerShell({
+  state,
+  pixelMap,
+  isGenerating,
+  error,
+  selectedType,
+  prompt,
+  onReForge,
+}: ViewerShellProps) {
+  if (state === 'loading' || isGenerating) {
+    return (
+      <div className={styles.viewer} role="status" aria-label="Generating avatar">
+        <LoadingIndicator />
+      </div>
+    )
+  }
+
+  if (state === 'error' && error) {
+    return (
+      <div className={styles.viewer} role="status" aria-label="Avatar viewer">
+        <ErrorDisplay message={error} />
+      </div>
+    )
+  }
+
+  if (state === 'result' && pixelMap) {
+    return (
+      <div className={styles.viewer} role="status" aria-label="Avatar result">
+        <AvatarGrid pixelMap={pixelMap} type={selectedType || 'character'} />
+        <div className={styles.actionRow}>
+          <DownloadButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
+          <button className={styles.btn} onClick={onReForge}>
+            RE-FORGE
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.viewer} role="status" aria-label="Avatar viewer">

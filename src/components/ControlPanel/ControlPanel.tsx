@@ -16,6 +16,8 @@ interface ControlPanelProps {
   onGenerate: () => void
   isGenerating: boolean
   hasApiKey: boolean
+  selectedType: string
+  onTypeSelect: (type: string) => void
 }
 
 export function ControlPanel({
@@ -24,6 +26,8 @@ export function ControlPanel({
   onGenerate,
   isGenerating,
   hasApiKey,
+  selectedType,
+  onTypeSelect,
 }: ControlPanelProps) {
   const disabled = isGenerating || !prompt.trim() || !hasApiKey
 
@@ -36,6 +40,14 @@ export function ControlPanel({
       }
     },
     [onGenerate, disabled],
+  )
+
+  const handleChipClick = useCallback(
+    (chip: typeof EXAMPLE_CHIPS[number]) => {
+      onTypeSelect(chip.label)
+      onPromptChange(chip.prompt)
+    },
+    [onTypeSelect, onPromptChange],
   )
 
   return (
@@ -63,8 +75,8 @@ export function ControlPanel({
         {EXAMPLE_CHIPS.map((chip) => (
           <button
             key={chip.label}
-            className={styles.chip}
-            onClick={() => onPromptChange(chip.prompt)}
+            className={`${styles.chip} ${selectedType === chip.label ? styles.chipSelected : ''}`}
+            onClick={() => handleChipClick(chip)}
             aria-label={`${chip.label} preset`}
           >
             {chip.label}

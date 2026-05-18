@@ -1,0 +1,29 @@
+.container {
+  background: #000;
+  border: 4px solid var(--border);
+  box-shadow: 8px 8px 0 var(--shadow);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  image-rendering: pixelated;
+}
+
+.grid {
+  image-rendering: pixelated;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--fg);
+  text-align: center;
+}
+
+.metadata {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}

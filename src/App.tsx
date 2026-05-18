@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { useApiKey } from '@/hooks/useApiKey'
 import { useProviderConfig } from '@/hooks/useProviderConfig'
+import { usePixelGeneration } from '@/hooks/usePixelGeneration'
 import { ThemeToggle } from '@/components/ThemeToggle/ThemeToggle'
 import { ApiKeyInput } from '@/components/ApiKeyInput/ApiKeyInput'
 import { ProviderSelect } from '@/components/ProviderSelect/ProviderSelect'
@@ -22,13 +23,33 @@ export function App() {
     setModel,
   } = useProviderConfig()
 
-  const [prompt, setPrompt] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
+  const {
+    pixelMap,
+    isGenerating,
+    error,
+    selectedType,
+    setSelectedType,
+    generate,
+    reset,
+  } = usePixelGeneration()
 
-  const handleGenerate = () => {
+  const [prompt, setPrompt] = useState('')
+
+  const handleGenerate = useCallback(() => {
     if (!prompt.trim() || !apiKey) return
-    setIsGenerating(true)
-    // Generation flow will be implemented in Epic 2
+    const fullPrompt = `Generate a pixel avatar for a ${selectedType} character named ${prompt}.`
+    generate(fullPrompt, { type: providerType, apiUrl, model, apiKey })
+  }, [prompt, apiKey, selectedType, generate, providerType, apiUrl, model])
+
+  const handleReForge = useCallback(() => {
+    reset()
+  }, [reset])
+
+  const getViewerState = () => {
+    if (isGenerating) return 'loading'
+    if (error) return 'error'
+    if (pixelMap) return 'result'
+    return 'empty'
   }
 
   return (
@@ -84,12 +105,22 @@ export function App() {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           hasApiKey={!!apiKey}
+          selectedType={selectedType}
+          onTypeSelect={setSelectedType}
         />
       </section>
 
       <section className={styles.section}>
         <h2 className={styles['section-label']}>03 // AVATAR</h2>
-        <ViewerShell state="empty" />
+        <ViewerShell
+          state={getViewerState()}
+          pixelMap={pixelMap}
+          isGenerating={isGenerating}
+          error={error}
+          selectedType={selectedType}
+          prompt={prompt}
+          onReForge={handleReForge}
+        />
       </section>
     </div>
   )
