@@ -55,6 +55,9 @@ export function useProviderConfig() {
     setSavedNotice(true)
     if (noticeTimer.current) clearTimeout(noticeTimer.current)
     noticeTimer.current = setTimeout(() => setSavedNotice(false), 3000)
+    return () => {
+      if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    }
   }, [providerType, apiUrl, model])
 
   const handleProviderChange = useCallback(

@@ -1,14 +1,7 @@
 import type { PixelGenRequest, PixelMapResponse, Result, AppError } from '@/types/pixelmap'
 import type { LLMProvider } from '@/services/providers'
 import { parsePixelMapResponse } from '@/services/parseResponse'
-
-const SYSTEM_PROMPT = `You are a pixel avatar generator. Respond ONLY with valid JSON matching this schema:
-{
-  "palette": ["#RRGGBB", ...],
-  "grid": [["#RRGGBB", ...], ...],
-  "label": "character name"
-}
-The grid must be 16x16, every cell a valid 6-digit hex color. Use a reduced 64-color NES-inspired palette. The label is the display name shown beneath the avatar.`
+import { SYSTEM_PROMPT } from '@/services/constants'
 
 const DEFAULT_MODEL = 'deepseek-v4-flash'
 
@@ -59,13 +52,17 @@ export class DeepSeekProvider implements LLMProvider {
       }
 
       const result = parsePixelMapResponse(content)
-      if (!result.ok && finishReason === 'length') {
+      if (finishReason === 'length') {
+        const truncMsg = 'The model ran out of output tokens before completing the avatar. Try a simpler character description or increase max_tokens.'
+        if (!result.ok) {
+          return {
+            ok: false,
+            error: { message: `${result.error.message}. ${truncMsg}`, code: 'TRUNCATED_RESPONSE' },
+          }
+        }
         return {
           ok: false,
-          error: {
-            message: 'The model ran out of output tokens before completing the avatar. Try a simpler character description or increase max_tokens.',
-            code: 'TRUNCATED_RESPONSE',
-          },
+          error: { message: truncMsg, code: 'TRUNCATED_RESPONSE' },
         }
       }
 

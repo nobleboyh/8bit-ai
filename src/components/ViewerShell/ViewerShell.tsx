@@ -44,11 +44,11 @@ export function ViewerShell({
 
   if (state === 'result' && pixelMap) {
     return (
-      <div className={styles.viewer} role="status" aria-label="Avatar result">
+      <div className={styles.viewer} role="region" aria-label="Avatar result">
         <AvatarGrid pixelMap={pixelMap} type={selectedType || 'character'} />
         <div className={styles.actionRow}>
           <DownloadButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
-          <button className={styles.btn} onClick={onReForge}>
+          <button className={styles.btn} onClick={onReForge} disabled={isGenerating}>
             RE-FORGE
           </button>
         </div>
@@ -57,7 +57,7 @@ export function ViewerShell({
   }
 
   return (
-    <div className={styles.viewer} role="status" aria-label="Avatar viewer">
+    <div className={styles.viewer} role="region" aria-label="Avatar viewer">
       <div className={styles.icon} role="img" aria-hidden={true}>&#x25A3;</div>
       <p className={styles.text}>ENTER A PROMPT & FORGE YOUR PIXEL</p>
     </div>

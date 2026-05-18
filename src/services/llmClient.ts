@@ -5,18 +5,25 @@ import { OpenAICompatibleProvider } from '@/services/OpenAICompatibleProvider'
 import { DeepSeekProvider } from '@/services/DeepSeekProvider'
 import type { LLMProvider } from '@/services/providers'
 
-const providers: Record<LLMProviderType, LLMProvider> = {
-  anthropic: new AnthropicProvider(),
-  openai: new OpenAIProvider(),
-  'openai-compatible': new OpenAICompatibleProvider(),
-  deepseek: new DeepSeekProvider(),
+let providers: Record<LLMProviderType, LLMProvider> | null = null
+
+function getProviders(): Record<LLMProviderType, LLMProvider> {
+  if (!providers) {
+    providers = {
+      anthropic: new AnthropicProvider(),
+      openai: new OpenAIProvider(),
+      'openai-compatible': new OpenAICompatibleProvider(),
+      deepseek: new DeepSeekProvider(),
+    }
+  }
+  return providers
 }
 
 export async function generate(
   providerType: LLMProviderType,
   request: PixelGenRequest,
 ): Promise<Result<PixelMapResponse>> {
-  const provider = providers[providerType]
+  const provider = getProviders()[providerType]
   if (!provider) {
     return {
       ok: false,

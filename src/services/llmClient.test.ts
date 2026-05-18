@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { generate } from './llmClient'
 
 const mockPixelMap = {
-  palette: ['#000'],
-  grid: [['#000']],
+  palette: ['#000000'],
+  grid: [['#000000']],
   label: 'Test',
 }
 

@@ -54,7 +54,7 @@ describe('AnthropicProvider', () => {
     expect(callUrl).toBe('https://api.anthropic.com/v1/messages')
     expect(callInit.headers).toMatchObject({
       'x-api-key': 'sk-test',
-      'anthropic-version': '2023-06-01',
+      'anthropic-version': '2025-01-01',
     })
   })
 

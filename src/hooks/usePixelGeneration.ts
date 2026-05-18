@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { generate as llmGenerate } from '@/services/llmClient'
 import type { PixelMapResponse, LLMProviderType } from '@/types/pixelmap'
 
@@ -7,11 +7,14 @@ export function usePixelGeneration() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedType, setSelectedType] = useState<string>('Wizard')
+  const generatingRef = useRef(false)
 
   const generate = useCallback(async (
     prompt: string,
     config: { type: LLMProviderType; apiUrl: string; model: string; apiKey: string },
   ) => {
+    if (generatingRef.current) return
+    generatingRef.current = true
     setIsGenerating(true)
     setError(null)
     setPixelMap(null)
@@ -32,11 +35,13 @@ export function usePixelGeneration() {
         setError(result.error.message)
       }
     }
+    generatingRef.current = false
     setIsGenerating(false)
   }, [])
 
   const reset = useCallback(() => {
     setPixelMap(null)
+    generatingRef.current = false
     setIsGenerating(false)
     setError(null)
   }, [])
