@@ -1,0 +1,935 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelForge — 8-Bit Avatar Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-display: 'Press Start 2P', monospace;
+  --font-body: 'Courier New', 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0f0e2e;
+  --surface: #1a1a3e;
+  --fg: #f0f0f0;
+  --muted: #8888aa;
+  --border: #3a3a6e;
+  --accent: #fcb84c;
+  --accent-dim: #a88830;
+  --danger: #dc2626;
+  --success: #48c848;
+  --scanline: rgba(255,255,255,0.015);
+  --shadow: rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg: #f5e6c8;
+  --surface: #faf0dc;
+  --fg: #3d2b1a;
+  --muted: #8b7355;
+  --border: #d4b896;
+  --accent: #d97a3a;
+  --accent-dim: #e8a068;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --scanline: rgba(0,0,0,0.025);
+  --shadow: rgba(0,0,0,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--scanline) 2px,
+      var(--scanline) 4px
+    );
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+header {
+  text-align: center;
+  padding: 32px 0 8px;
+}
+
+header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 4vw, 28px);
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 4px 4px 0 var(--shadow);
+  line-height: 1.4;
+}
+
+header h1 span { display: inline-block; }
+header p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 8px;
+  letter-spacing: 1px;
+  font-family: var(--font-display);
+}
+
+.section {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  padding: 24px 20px;
+  image-rendering: pixelated;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  color: var(--fg);
+  outline: none;
+  transition: border-color 0.15s;
+  image-rendering: pixelated;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.api-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.api-row input { flex: 1; }
+
+.btn {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 12px 20px;
+  border: 3px solid var(--border);
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  image-rendering: pixelated;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+.btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-size: 12px;
+  padding: 14px 28px;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-dim);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.generate-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.generate-row textarea { flex: 1; }
+
+.examples-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.example-chip {
+  font-size: 10px;
+  padding: 6px 10px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.1s;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+.example-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewer {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.viewer-empty {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 10px;
+  text-align: center;
+  letter-spacing: 1px;
+  line-height: 2;
+}
+
+.viewer-empty .icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.3;
+  image-rendering: pixelated;
+}
+
+.viewer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.pixel-loader {
+  width: 48px;
+  height: 48px;
+  background: var(--accent);
+  animation: blink 0.6s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.loading-text {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--muted);
+  animation: pulse-text 1.5s step-end infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.viewer-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.avatar-display {
+  position: relative;
+  border: 4px solid var(--border);
+  padding: 12px;
+  background: #000;
+  image-rendering: pixelated;
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.avatar-display canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.avatar-meta {
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.error-box {
+  padding: 12px 16px;
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  font-size: 12px;
+  font-family: var(--font-body);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.byok-notice {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.byok-notice a {
+  color: var(--accent);
+}
+
+.theme-toggle {
+  margin-top: 12px;
+  font-size: 9px;
+  padding: 8px 16px;
+}
+
+.custom-select {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  user-select: none;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 12px 14px;
+  padding-right: 36px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s;
+  image-rendering: pixelated;
+  position: relative;
+}
+
+.custom-select-trigger::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--muted);
+  transition: transform 0.15s;
+}
+
+.custom-select.open .custom-select-trigger::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.custom-select-trigger:hover,
+.custom-select.open .custom-select-trigger {
+  border-color: var(--accent);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-top: none;
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.custom-select.open .custom-select-dropdown {
+  display: block;
+}
+
+.custom-select-option {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--fg);
+  background: var(--surface);
+  transition: background 0.1s;
+  image-rendering: pixelated;
+}
+
+.custom-select-option:hover {
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface));
+}
+
+.custom-select-option.selected {
+  background: var(--accent);
+  color: #000;
+}
+
+.config-field + .config-field {
+  margin-top: 14px;
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+  .container { padding: 16px 12px 32px; }
+  .section { padding: 16px 12px; }
+  .generate-row { flex-direction: column; }
+  .api-row { flex-direction: column; }
+  .action-row { flex-direction: column; align-items: stretch; }
+  .action-row .btn { text-align: center; }
+  .viewer { min-height: 240px; padding: 16px; }
+}
+
+@media (max-width: 360px) {
+  .section { padding: 12px 8px; }
+  .example-chip { font-size: 8px; padding: 4px 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <h1><span>PIXEL</span><br><span>FORGE</span></h1>
+  <p>8-BIT AVATAR GENERATOR</p>
+  <button class="btn theme-toggle" id="themeToggle" title="Toggle theme">DARK</button>
+</header>
+
+<div class="section">
+  <div class="section-label">01 // CONFIG</div>
+
+  <div class="config-field">
+    <label>PROVIDER</label>
+    <div class="custom-select" id="providerSelectWrap">
+      <button class="custom-select-trigger" type="button" data-value="replicate">Replicate</button>
+      <div class="custom-select-dropdown">
+        <div class="custom-select-option selected" data-value="replicate">Replicate</div>
+        <div class="custom-select-option" data-value="openai">OpenAI / DALL-E</div>
+        <div class="custom-select-option" data-value="openai-compat">OpenAI Compatible</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="config-field">
+    <label>API URL</label>
+    <input type="text" id="apiUrl" placeholder="https://api.replicate.com" spellcheck="false">
+  </div>
+
+  <div class="config-field">
+    <label>MODEL</label>
+    <input type="text" id="model" placeholder="black-forest-labs/flux-schnell" spellcheck="false">
+  </div>
+
+  <div class="config-field">
+    <label>API KEY</label>
+    <div class="api-row">
+      <input type="password" id="apiKey" placeholder="r8_..." spellcheck="false">
+      <button class="btn" id="toggleKey" title="Show/hide key">SHOW</button>
+    </div>
+  </div>
+
+  <div class="byok-notice">Settings saved locally</div>
+</div>
+
+<div class="section">
+  <div class="section-label">02 // PROMPT</div>
+  <div class="generate-row">
+    <textarea id="prompt" placeholder="Describe your avatar... e.g. cyberpunk ninja with neon katana"></textarea>
+    <button class="btn btn-primary" id="generateBtn">FORGE</button>
+  </div>
+  <div class="examples-row">
+    <span class="example-chip" data-prompt="wizard with staff and blue robes">Wizard</span>
+    <span class="example-chip" data-prompt="knight in silver armor with red shield">Knight</span>
+    <span class="example-chip" data-prompt="robot with glowing blue eyes">Robot</span>
+    <span class="example-chip" data-prompt="space explorer in orange suit">Astronaut</span>
+    <span class="example-chip" data-prompt="ninja in black with red scarf">Ninja</span>
+    <span class="example-chip" data-prompt="elf archer in green cloak">Elf</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">03 // AVATAR</div>
+  <div class="viewer" id="viewer">
+    <div class="viewer-empty" id="emptyState">
+      <span class="icon">&#x25A3;</span>
+      <div>ENTER A PROMPT</div>
+      <div>&amp; FORGE YOUR PIXEL</div>
+    </div>
+    <div class="viewer-loading hidden" id="loadingState">
+      <div class="pixel-loader"></div>
+      <div class="loading-text">GENERATING...</div>
+    </div>
+    <div class="viewer-result hidden" id="resultState">
+      <div class="avatar-display">
+        <canvas id="avatarCanvas" width="256" height="256"></canvas>
+      </div>
+      <div class="avatar-meta" id="avatarMeta"></div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="downloadBtn">DOWNLOAD PNG</button>
+        <button class="btn" id="regenerateBtn">RE-FORGE</button>
+      </div>
+    </div>
+    <div class="error-box hidden" id="errorState"></div>
+  </div>
+</div>
+
+<div class="byok-notice" style="border:none;margin-top:0">
+  NES palette &middot; 32&times;32 pixels &middot; AI + procedural pixelation
+</div>
+
+</div>
+
+<script>
+(function() {
+  // --- theme management ---
+  const themeToggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    try { localStorage.setItem('pixelforge-theme', theme); } catch(_) {}
+    themeToggle.textContent = theme === 'dark' ? 'LIGHT' : 'DARK';
+  }
+  const saved = (() => { try { return localStorage.getItem('pixelforge-theme'); } catch(_) { return null; } })();
+  setTheme(saved === 'light' ? 'light' : 'dark');
+  themeToggle.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // --- custom provider select ---
+  const selectWrap = document.getElementById('providerSelectWrap');
+  const selectTrigger = selectWrap.querySelector('.custom-select-trigger');
+
+  function getSelectedProvider() {
+    const sel = selectWrap.querySelector('.custom-select-option.selected');
+    return sel ? sel.dataset.value : 'replicate';
+  }
+
+  function setSelectedProvider(value) {
+    selectWrap.querySelectorAll('.custom-select-option').forEach(opt => {
+      if (opt.dataset.value === value) {
+        opt.classList.add('selected');
+        selectTrigger.textContent = opt.textContent;
+        selectTrigger.dataset.value = value;
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
+  }
+
+  selectTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectWrap.classList.toggle('open');
+  });
+
+  selectWrap.querySelectorAll('.custom-select-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      setSelectedProvider(opt.dataset.value);
+      selectWrap.classList.remove('open');
+      applyProviderPreset(getSelectedProvider());
+      saveConfig();
+    });
+  });
+
+  document.addEventListener('click', () => {
+    selectWrap.classList.remove('open');
+  });
+
+  // --- provider presets ---
+  const PROVIDER_PRESETS = {
+    replicate: {
+      url: 'https://api.replicate.com',
+      model: 'black-forest-labs/flux-schnell',
+      keyPlaceholder: 'r8_...'
+    },
+    openai: {
+      url: 'https://api.openai.com',
+      model: 'dall-e-3',
+      keyPlaceholder: 'sk-...'
+    },
+    'openai-compat': {
+      url: 'https://api.together.xyz',
+      model: 'black-forest-labs/FLUX.1-schnell',
+      keyPlaceholder: 'sk-...'
+    }
+  };
+
+  function applyProviderPreset(provider) {
+    const preset = PROVIDER_PRESETS[provider];
+    if (!preset) return;
+    apiUrlInput.value = preset.url;
+    modelInput.value = preset.model;
+    apiKey.placeholder = preset.keyPlaceholder;
+  }
+
+  // --- NES palette (well-known 64-color approximation) ---
+  const NES = [
+    0x7c7c7c,0x0000fc,0x0000bc,0x4428bc,0x940084,0xa80020,0xa81000,0x881400,
+    0x503000,0x007800,0x006800,0x0058d8,0x0000e8,0x0000a8,0xbcbcbc,0xfcfcfc,
+    0xf8f8f8,0xbcbcbc,0x7c7c7c,0xa4e4fc,0x3cbcfc,0x0088f0,0x0000e4,0x0000a4,
+    0x4400a4,0x8400a4,0xa40050,0xa40000,0x7c2c00,0x585800,0x007800,0x006800,
+    0x0058d8,0x005ce0,0xfcfcfc,0xf0f8fc,0xc8e4fc,0xa0c8f0,0x7cacf0,0x548cf0,
+    0x2870e8,0x1454d0,0x003cb8,0x00249c,0x000080,0x000064,0x000048,0x000030,
+    0x3024a4,0x5c3ca4,0x8454a4,0xa86ca4,0xc884a4,0xe89ca4,0xfcaca4,0xfcb89c,
+    0xfcbc94,0xfcbc8c,0xfcb884,0xfcb07c,0xfca878,0xf4a07c,0xe89480,0xdc8488
+  ];
+
+  const PIXEL_SIZE = 32;
+
+  // DOM refs
+  const apiKey     = document.getElementById('apiKey');
+  const toggleKey  = document.getElementById('toggleKey');
+  const apiUrlInput= document.getElementById('apiUrl');
+  const modelInput = document.getElementById('model');
+  const prompt     = document.getElementById('prompt');
+  const generateBtn= document.getElementById('generateBtn');
+  const viewer     = document.getElementById('viewer');
+  const emptyState = document.getElementById('emptyState');
+  const loadingState=document.getElementById('loadingState');
+  const resultState= document.getElementById('resultState');
+  const errorState = document.getElementById('errorState');
+  const avatarCanvas=document.getElementById('avatarCanvas');
+  const avatarMeta = document.getElementById('avatarMeta');
+  const downloadBtn= document.getElementById('downloadBtn');
+  const regenerateBtn=document.getElementById('regenerateBtn');
+
+  // --- helpers ---
+  function show(el) { el.classList.remove('hidden'); }
+  function hide(el) { el.classList.add('hidden'); }
+  function setError(msg) {
+    hide(emptyState); hide(loadingState); hide(resultState);
+    errorState.textContent = msg;
+    show(errorState);
+  }
+  function showEmpty() {
+    hide(loadingState); hide(resultState); hide(errorState);
+    show(emptyState);
+  }
+  function showLoading() {
+    hide(emptyState); hide(resultState); hide(errorState);
+    show(loadingState);
+  }
+  function showResult() {
+    hide(emptyState); hide(loadingState); hide(errorState);
+    show(resultState);
+  }
+
+  function restoreConfig() {
+    try {
+      const saved = localStorage.getItem('pixelforge-config');
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        if (cfg.provider) setSelectedProvider(cfg.provider);
+        if (cfg.apiUrl) apiUrlInput.value = cfg.apiUrl;
+        if (cfg.model) modelInput.value = cfg.model;
+        if (cfg.apiKey) apiKey.value = cfg.apiKey;
+        const preset = PROVIDER_PRESETS[cfg.provider];
+        if (preset) apiKey.placeholder = preset.keyPlaceholder;
+      }
+    } catch(_) {}
+  }
+  function saveConfig() {
+    try {
+      localStorage.setItem('pixelforge-config', JSON.stringify({
+        provider: getSelectedProvider(),
+        apiUrl: apiUrlInput.value.trim(),
+        model: modelInput.value.trim(),
+        apiKey: apiKey.value.trim()
+      }));
+    } catch(_) {}
+  }
+  restoreConfig();
+
+  toggleKey.addEventListener('click', () => {
+    if (apiKey.type === 'password') {
+      apiKey.type = 'text';
+      toggleKey.textContent = 'HIDE';
+    } else {
+      apiKey.type = 'password';
+      toggleKey.textContent = 'SHOW';
+    }
+  });
+
+  document.querySelectorAll('.example-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      prompt.value = chip.dataset.prompt;
+      prompt.focus();
+    });
+  });
+
+  // --- API generation ---
+  async function generatePrediction(config, promptText) {
+    const { provider, apiUrl, model, apiKey } = config;
+    const base = apiUrl.replace(/\/+$/, '');
+    const pixelPrompt = `pixel art character, ${promptText}, 8-bit retro game sprite, simple background, crisp pixels, flat colors, game asset, centered full body character`;
+
+    if (provider === 'replicate') {
+      const res = await fetch(`${base}/v1/models/${model}/predictions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'wait'
+        },
+        body: JSON.stringify({ input: { prompt: pixelPrompt } })
+      });
+      if (!res.ok) {
+        let detail = '';
+        try { const j = await res.json(); detail = j.detail || JSON.stringify(j); } catch(_) { detail = res.statusText; }
+        throw new Error(`API ${res.status}: ${detail}`);
+      }
+      const prediction = await res.json();
+
+      let outputUrl = '';
+      if (prediction.status === 'succeeded') {
+        outputUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+      } else if (prediction.urls && prediction.urls.get) {
+        for (let i = 0; i < 60; i++) {
+          await new Promise(r => setTimeout(r, 1000));
+          const pr = await fetch(prediction.urls.get, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+          if (!pr.ok) throw new Error(`Poll error ${pr.status}`);
+          const data = await pr.json();
+          if (data.status === 'succeeded') { outputUrl = Array.isArray(data.output) ? data.output[0] : data.output; break; }
+          if (data.status === 'failed') throw new Error(data.error || 'Prediction failed');
+        }
+        if (!outputUrl) throw new Error('Timed out waiting for generation');
+      }
+      if (!outputUrl) throw new Error('No output URL from API');
+      return outputUrl;
+    }
+
+    // OpenAI / OpenAI Compatible
+    const res = await fetch(`${base}/v1/images/generations`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        prompt: pixelPrompt,
+        n: 1,
+        size: '1024x1024'
+      })
+    });
+    if (!res.ok) {
+      let detail = '';
+      try { const j = await res.json(); detail = j.error?.message || JSON.stringify(j); } catch(_) { detail = res.statusText; }
+      throw new Error(`API ${res.status}: ${detail}`);
+    }
+    const data = await res.json();
+    if (data.data && data.data[0] && data.data[0].url) {
+      return data.data[0].url;
+    }
+    throw new Error('No image URL in response. Check model supports /v1/images/generations.');
+  }
+
+  // --- pixelation ---
+  function hexToRgb(hex) {
+    return [(hex >> 16) & 0xff, (hex >> 8) & 0xff, hex & 0xff];
+  }
+
+  const NES_RGB = NES.map(hexToRgb);
+
+  function closestNES(r, g, b) {
+    let best = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < NES_RGB.length; i++) {
+      const dr = r - NES_RGB[i][0];
+      const dg = g - NES_RGB[i][1];
+      const db = b - NES_RGB[i][2];
+      const d = dr*dr + dg*dg + db*db;
+      if (d < bestDist) { bestDist = d; best = i; }
+    }
+    return NES[best];
+  }
+
+  function pixelateImage(img) {
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+
+    const off = document.createElement('canvas');
+    off.width = PIXEL_SIZE;
+    off.height = PIXEL_SIZE;
+    const ctx = off.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, 0, 0, PIXEL_SIZE, PIXEL_SIZE);
+
+    const imgData = ctx.getImageData(0, 0, PIXEL_SIZE, PIXEL_SIZE);
+    const data = imgData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const c = closestNES(data[i], data[i+1], data[i+2]);
+      data[i]   = (c >> 16) & 0xff;
+      data[i+1] = (c >> 8) & 0xff;
+      data[i+2] = c & 0xff;
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    const displaySize = 256;
+    const out = document.createElement('canvas');
+    out.width = displaySize;
+    out.height = displaySize;
+    const octx = out.getContext('2d');
+    octx.imageSmoothingEnabled = false;
+    octx.drawImage(off, 0, 0, displaySize, displaySize);
+
+    return out;
+  }
+
+  // --- main generate flow ---
+  let lastRawUrl = '';
+  let isGenerating = false;
+
+  async function runGenerate() {
+    const key = apiKey.value.trim();
+    const p = prompt.value.trim();
+    const url = apiUrlInput.value.trim();
+    const mdl = modelInput.value.trim();
+    const prov = getSelectedProvider();
+
+    if (!key) { setError('Enter your API key.'); return; }
+    if (!p)   { setError('Enter a prompt for your avatar.'); return; }
+    if (!url) { setError('Enter the API URL.'); return; }
+    if (!mdl) { setError('Enter the model name.'); return; }
+
+    if (isGenerating) return;
+    isGenerating = true;
+    generateBtn.disabled = true;
+    saveConfig();
+    showLoading();
+
+    try {
+      const outputUrl = await generatePrediction({ provider: prov, apiUrl: url, model: mdl, apiKey: key }, p);
+
+      lastRawUrl = outputUrl;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error('Failed to load generated image'));
+        img.src = outputUrl;
+      });
+
+      const pixelCanvas = pixelateImage(img);
+      const displayCtx = avatarCanvas.getContext('2d');
+      displayCtx.imageSmoothingEnabled = false;
+      avatarCanvas.width = pixelCanvas.width;
+      avatarCanvas.height = pixelCanvas.height;
+      displayCtx.drawImage(pixelCanvas, 0, 0);
+
+      const shortPrompt = p.length > 40 ? p.slice(0, 37) + '...' : p;
+      avatarMeta.textContent = `${PIXEL_SIZE}\u00d7${PIXEL_SIZE} pixel  \u00b7  NES palette  \u00b7  "${shortPrompt}"`;
+      showResult();
+
+    } catch (err) {
+      setError(err.message || 'Generation failed. Check your config and try again.');
+    } finally {
+      isGenerating = false;
+      generateBtn.disabled = false;
+    }
+  }
+
+  generateBtn.addEventListener('click', runGenerate);
+
+  regenerateBtn.addEventListener('click', runGenerate);
+
+  prompt.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); runGenerate(); }
+  });
+
+  // --- download ---
+  downloadBtn.addEventListener('click', () => {
+    if (!lastRawUrl) return;
+    avatarCanvas.toBlob(blob => {
+      if (!blob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `pixelforge-avatar-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  });
+
+  showEmpty();
+})();
+</script>
+</body>
+</html>
