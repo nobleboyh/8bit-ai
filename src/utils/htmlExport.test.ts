@@ -65,7 +65,7 @@ describe('htmlExport', () => {
     expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
   })
 
-  it('uses correct filename format pixelforce-[type]-[username].html', () => {
+  it('uses correct filename format pixelforce-[prefix]-[username].html', () => {
     mockBrowserApis()
     const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((el: Node) => el)
     vi.spyOn(document.body, 'removeChild').mockImplementation((el: Node) => el)

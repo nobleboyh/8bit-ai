@@ -49,7 +49,7 @@ export function ViewerShell({
         <AvatarGrid pixelMap={pixelMap} type={selectedType || 'character'} />
         <div className={styles.actionRow}>
           <DownloadButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
-          <DownloadHtmlButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
+          <DownloadHtmlButton pixelMap={pixelMap} prefix={selectedType || 'character'} username={prompt || 'avatar'} />
           <button className={styles.btn} onClick={onReForge} disabled={isGenerating}>
             RE-FORGE
           </button>

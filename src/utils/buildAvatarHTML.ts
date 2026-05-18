@@ -1,7 +1,3 @@
-function sanitize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '')
-}
-
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -11,16 +7,25 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#039;')
 }
 
+function isValidHex(colour: string): boolean {
+  return /^#[0-9a-fA-F]{6}$/.test(colour)
+}
+
 export function buildAvatarHTML(grid: string[][], label: string, prefix: string, username: string): string {
   const n = grid.length
-  const safePrefix = sanitize(prefix)
-  const safeUser = sanitize(username)
+  if (n === 0) {
+    return '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Pixelforce Avatar</title>\n</head>\n<body>\n  <p>No avatar data</p>\n</body>\n</html>'
+  }
 
-  const cells = grid.map((row) =>
-    row.map((colour) =>
-      `      <div style="background:${colour}"></div>`,
-    ).join('\n'),
-  ).join('\n')
+  const cells = grid.map((row) => {
+    if (row.length !== grid[0].length) {
+      row.length = grid[0].length
+    }
+    return row.map((colour) => {
+      const safeColour = isValidHex(colour) ? colour : '#000000'
+      return `      <div style="background:${escapeHtml(safeColour)}"></div>`
+    }).join('\n')
+  }).join('\n')
 
   const escapedLabel = escapeHtml(label)
 
@@ -46,7 +51,7 @@ export function buildAvatarHTML(grid: string[][], label: string, prefix: string,
     .grid {
       display: grid;
       grid-template-columns: repeat(${n}, 1fr);
-      width: min(80vw, ${n * 16}px);
+      width: ${n * 16}px;
       aspect-ratio: 1 / 1;
       margin: 0 auto;
     }

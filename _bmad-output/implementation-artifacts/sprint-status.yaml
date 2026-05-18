@@ -23,7 +23,21 @@ development_status:
   2-2-pixel-generation-flow-and-state-management: review
   2-3-avatar-rendering-loading-indicator-and-png-export: review
   feat-002-epic-1: backlog
-  feat-002-1-1-build-avatar-html: ready-for-dev
-  feat-002-1-2-html-export-utility: ready-for-dev
+  feat-002-1-1-build-avatar-html: done
+  feat-002-1-2-html-export-utility: done
 
 last_updated: 2026-05-18
+
+review_history:
+  feat-002-1-1-build-avatar-html:
+    reviewed: 2026-05-18
+    result: done
+    patches_applied: 7
+    deferred: 1
+    dismissed: 0
+  feat-002-1-2-html-export-utility:
+    reviewed: 2026-05-18
+    result: done
+    patches_applied: 7
+    deferred: 0
+    dismissed: 1

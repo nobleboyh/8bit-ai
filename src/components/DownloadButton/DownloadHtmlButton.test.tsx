@@ -19,29 +19,28 @@ describe('DownloadHtmlButton', () => {
   })
 
   it('renders DOWNLOAD HTML button', () => {
-    render(<DownloadHtmlButton pixelMap={mockPixelMap} type="Wizard" name="hero" />)
+    render(<DownloadHtmlButton pixelMap={mockPixelMap} prefix="Wizard" username="hero" />)
     expect(screen.getByText('DOWNLOAD HTML')).toBeTruthy()
   })
 
-  it('is disabled when pixelMap is null', () => {
-    render(<DownloadHtmlButton pixelMap={null} type="Wizard" name="hero" />)
-    expect(screen.getByLabelText('Download HTML')).toBeDisabled()
+  it('renders nothing when pixelMap is null', () => {
+    const { container } = render(<DownloadHtmlButton pixelMap={null} prefix="Wizard" username="hero" />)
+    expect(container.innerHTML).toBe('')
   })
 
-  it('is enabled when pixelMap is provided', () => {
-    render(<DownloadHtmlButton pixelMap={mockPixelMap} type="Wizard" name="hero" />)
-    expect(screen.getByLabelText('Download HTML')).not.toBeDisabled()
+  it('has aria-label Download HTML', () => {
+    render(<DownloadHtmlButton pixelMap={mockPixelMap} prefix="Wizard" username="hero" />)
+    expect(screen.getByLabelText('Download HTML')).toBeTruthy()
   })
 
   it('calls htmlExport on click', () => {
-    render(<DownloadHtmlButton pixelMap={mockPixelMap} type="Knight" name="Sir Test" />)
+    render(<DownloadHtmlButton pixelMap={mockPixelMap} prefix="Knight" username="Sir Test" />)
     fireEvent.click(screen.getByLabelText('Download HTML'))
     expect(mockHtmlExport).toHaveBeenCalledWith(mockPixelMap.grid, mockPixelMap.label, 'Knight', 'Sir Test')
   })
 
-  it('does not call htmlExport when pixelMap is null', () => {
-    render(<DownloadHtmlButton pixelMap={null} type="Wizard" name="hero" />)
-    fireEvent.click(screen.getByLabelText('Download HTML'))
-    expect(mockHtmlExport).not.toHaveBeenCalled()
+  it('does not render when pixelMap is null (no button to click)', () => {
+    const { container } = render(<DownloadHtmlButton pixelMap={null} prefix="Wizard" username="hero" />)
+    expect(container.innerHTML).toBe('')
   })
 })

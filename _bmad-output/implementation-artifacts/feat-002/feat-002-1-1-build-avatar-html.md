@@ -1,6 +1,6 @@
 # Story FEAT-002.1.1: buildAvatarHTML Pure Function
 
-Status: review
+Status: done
 
 ## Story
 
@@ -149,3 +149,14 @@ The light background is `#f5e6c8` (matching the app's light theme warm parchment
 ## Change Log
 
 - 2026-05-18: Implemented buildAvatarHTML function and test suite
+
+### Review Findings
+
+- [x] [Review][Patch] Cell colour format now validated as #RRGGBB — added `isValidHex()` guard; invalid colours default to `#000000` [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Patch] Unsanitized grid colour values fixed — colour values now passed through `escapeHtml()` before interpolation into `style` attribute [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Patch] Empty grid handled — returns early with fallback HTML when `grid.length === 0` [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Patch] Ragged grid handled — rows with inconsistent lengths are truncated to match `grid[0].length` [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Patch] Dead code removed — unused `safePrefix`/`safeUser` variables eliminated [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Patch] Duplicated `sanitize` extracted — shared `src/utils/sanitize.ts` created; both `buildAvatarHTML.ts` and `htmlExport.ts` import from it [`src/utils/sanitize.ts`]
+- [x] [Review][Patch] `width: min(80vw, ...)` replaced with fixed `${n * 16}px` — consistent rendering regardless of viewport [`src/utils/buildAvatarHTML.ts`]
+- [x] [Review][Defer] `font-family: monospace, sans-serif` renders differently across platforms — offline export may not match in-app view identically across OSes with different monospace font metrics; pre-existing issue not specific to this change [`src/utils/buildAvatarHTML.ts`]

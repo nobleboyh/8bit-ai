@@ -1,11 +1,16 @@
 import { buildAvatarHTML } from '@/utils/buildAvatarHTML'
-
-function sanitize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '')
-}
+import { sanitize } from '@/utils/sanitize'
 
 export function htmlExport(grid: string[][], label: string, prefix: string, username: string): void {
-  const html = buildAvatarHTML(grid, label, prefix, username)
+  if (!document.body) return
+
+  let html: string
+  try {
+    html = buildAvatarHTML(grid, label, prefix, username)
+  } catch {
+    return
+  }
+
   const blob = new Blob([html], { type: 'text/html' })
 
   const safeType = sanitize(prefix) || 'avatar'
@@ -17,7 +22,10 @@ export function htmlExport(grid: string[][], label: string, prefix: string, user
   a.download = `pixelforce-${safeType}-${safeName}.html`
   a.style.display = 'none'
   document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  try {
+    a.click()
+    document.body.removeChild(a)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }

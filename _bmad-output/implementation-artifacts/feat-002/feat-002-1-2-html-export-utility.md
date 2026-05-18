@@ -1,6 +1,6 @@
 # Story FEAT-002.1.2: HTML Export Utility & Download Button
 
-Status: review
+Status: done
 
 ## Story
 
@@ -163,3 +163,16 @@ const sanitize = (s: string) => s.toLowerCase().replace(/[^a-z0-9-]/g, '').repla
 ### Change Log
 
 - 2026-05-18: Implemented htmlExport utility, DownloadHtmlButton component, and updated ViewerShell
+
+### Review Findings
+
+- [x] [Review][Decision] `htmlExport` returns `void` (accepted) — decision to follow `pngExport.ts` pattern; errors are silent/best-effort [`src/utils/htmlExport.ts`]
+- [x] [Review][Patch] Download HTML button now conditionally rendered — returns `null` when `pixelMap` is null; hidden before generation, visible after [`src/components/DownloadButton/DownloadHtmlButton.tsx`]
+- [x] [Review][Patch] `buildAvatarHTML` call wrapped in try/catch — exceptions caught silently (consistent with best-effort pattern) [`src/utils/htmlExport.ts`]
+- [x] [Review][Patch] `document.body` null guard added — early return if `document.body` is null (SSR-safe) [`src/utils/htmlExport.ts`]
+- [x] [Review][Patch] `removeChild` wrapped in try/finally — `URL.revokeObjectURL` always called even if removeChild throws [`src/utils/htmlExport.ts`]
+- [x] [Review][Patch] Duplicated `sanitize` extracted — shared `src/utils/sanitize.ts` created; both files import from it [`src/utils/sanitize.ts`]
+- [x] [Review][Patch] Prop names renamed to `prefix`/`username` — consistent with spec and utility function signatures [`src/components/DownloadButton/DownloadHtmlButton.tsx`]
+- [x] [Review][Patch] `font-size` increased from 9px to 12px — meets minimum WCAG AA readability [`src/components/DownloadButton/DownloadHtmlButton.module.css`]
+- [x] [Review][Patch] `useCallback` removed — unnecessary overhead, component has no `React.memo` wrapper [`src/components/DownloadButton/DownloadHtmlButton.tsx`]
+- [x] [Review][Dismiss] `as any` cast on `Blob` spy — standard Vitest pattern for spying on constructors; acceptable limitation [`src/utils/htmlExport.test.ts`]

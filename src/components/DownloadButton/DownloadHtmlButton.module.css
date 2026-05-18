@@ -9,17 +9,11 @@
   min-height: 44px;
 }
 
-.btn:hover:not(:disabled) {
+.btn:hover {
   background: var(--accent);
   border-color: var(--accent-dim);
 }
 
-.btn:active:not(:disabled) {
+.btn:active {
   transform: translate(2px, 2px);
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
 }
