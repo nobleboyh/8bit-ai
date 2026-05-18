@@ -22,5 +22,8 @@ development_status:
   2-1-llm-provider-abstraction-layer: review
   2-2-pixel-generation-flow-and-state-management: review
   2-3-avatar-rendering-loading-indicator-and-png-export: review
+  feat-002-epic-1: backlog
+  feat-002-1-1-build-avatar-html: ready-for-dev
+  feat-002-1-2-html-export-utility: ready-for-dev
 
 last_updated: 2026-05-18

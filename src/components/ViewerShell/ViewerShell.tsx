@@ -3,6 +3,7 @@ import { ErrorDisplay } from '@/components/ErrorDisplay/ErrorDisplay'
 import { AvatarGrid } from '@/components/AvatarGrid/AvatarGrid'
 import { LoadingIndicator } from '@/components/LoadingIndicator/LoadingIndicator'
 import { DownloadButton } from '@/components/DownloadButton/DownloadButton'
+import { DownloadHtmlButton } from '@/components/DownloadButton/DownloadHtmlButton'
 import styles from './ViewerShell.module.css'
 
 export type ViewerState = 'empty' | 'loading' | 'result' | 'error'
@@ -48,6 +49,7 @@ export function ViewerShell({
         <AvatarGrid pixelMap={pixelMap} type={selectedType || 'character'} />
         <div className={styles.actionRow}>
           <DownloadButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
+          <DownloadHtmlButton pixelMap={pixelMap} type={selectedType || 'character'} name={prompt || 'avatar'} />
           <button className={styles.btn} onClick={onReForge} disabled={isGenerating}>
             RE-FORGE
           </button>

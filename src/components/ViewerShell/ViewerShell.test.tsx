@@ -41,6 +41,7 @@ describe('ViewerShell', () => {
     )
     expect(screen.getByText('Test Avatar')).toBeTruthy()
     expect(screen.getByText('DOWNLOAD PNG')).toBeTruthy()
+    expect(screen.getByText('DOWNLOAD HTML')).toBeTruthy()
     expect(screen.getByText('RE-FORGE')).toBeTruthy()
   })
 
