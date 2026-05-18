@@ -1,6 +1,6 @@
 # Story 1.1: Project Scaffold & Build Tooling
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -22,36 +22,36 @@ So that I can develop with HMR and produce a portable single-file output.
 
 ## Tasks / Subtasks
 
-- [ ] Scaffold project with Vite 6 + React 18 + TypeScript
-  - [ ] Run `npm create vite@latest pixelforge -- --template react-ts`
-  - [ ] Run `npm install` to resolve dependencies
-  - [ ] Verify `npm run dev` starts HMR server
-- [ ] Configure single-file build
-  - [ ] Install `npm install -D vite-plugin-singlefile@2.3.3`
-  - [ ] Configure `vite.config.ts` with `vite-plugin-singlefile` plugin
-  - [ ] Verify `npm run build` produces single `dist/index.html`
-- [ ] Configure `@/` path alias
-  - [ ] Update `vite.config.ts` with resolve alias: `@` → `./src`
-  - [ ] Update `tsconfig.json` / `tsconfig.app.json` with paths: `{"@/*": ["./src/*"]}`
-- [ ] Create directory structure
-  - [ ] Create `src/components/`
-  - [ ] Create `src/hooks/`
-  - [ ] Create `src/services/`
-  - [ ] Create `src/types/`
-  - [ ] Create `src/utils/`
-  - [ ] Add placeholder `.gitkeep` files if needed
-- [ ] Enable TypeScript strict mode
-  - [ ] Set `"strict": true` in `tsconfig.json` / `tsconfig.app.json`
-  - [ ] Verify `npx tsc --noEmit` passes
-- [ ] Set up testing framework
-  - [ ] Install Vitest: `npm install -D vitest`
-  - [ ] Install React Testing Library: `npm install -D @testing-library/react @testing-library/jest-dom jsdom`
-  - [ ] Configure Vitest in `vite.config.ts` with jsdom environment
-  - [ ] Add test script to `package.json`: `"test": "vitest run"`
-- [ ] Clean up starter template boilerplate
-  - [ ] Remove default App.css content
-  - [ ] Remove default Vite/React logos and assets
-  - [ ] Update `index.html` title to "PixelForge — 8-Bit Avatar Generator"
+- [x] Scaffold project with Vite 6 + React 18 + TypeScript
+  - [x] Run `npm create vite@latest pixelforge -- --template react-ts`
+  - [x] Run `npm install` to resolve dependencies
+  - [x] Verify `npm run dev` starts HMR server
+- [x] Configure single-file build
+  - [x] Install `npm install -D vite-plugin-singlefile@2.3.3`
+  - [x] Configure `vite.config.ts` with `vite-plugin-singlefile` plugin
+  - [x] Verify `npm run build` produces single `dist/index.html`
+- [x] Configure `@/` path alias
+  - [x] Update `vite.config.ts` with resolve alias: `@` → `./src`
+  - [x] Update `tsconfig.json` / `tsconfig.app.json` with paths: `{"@/*": ["./src/*"]}`
+- [x] Create directory structure
+  - [x] Create `src/components/`
+  - [x] Create `src/hooks/`
+  - [x] Create `src/services/`
+  - [x] Create `src/types/`
+  - [x] Create `src/utils/`
+  - [x] Add placeholder `.gitkeep` files if needed
+- [x] Enable TypeScript strict mode
+  - [x] Set `"strict": true` in `tsconfig.json` / `tsconfig.app.json`
+  - [x] Verify `npx tsc --noEmit` passes
+- [x] Set up testing framework
+  - [x] Install Vitest: `npm install -D vitest`
+  - [x] Install React Testing Library: `npm install -D @testing-library/react @testing-library/jest-dom jsdom`
+  - [x] Configure Vitest in `vite.config.ts` with jsdom environment
+  - [x] Add test script to `package.json`: `"test": "vitest run"`
+- [x] Clean up starter template boilerplate
+  - [x] Remove default App.css content
+  - [x] Remove default Vite/React logos and assets
+  - [x] Update `index.html` title to "PixelForge — 8-Bit Avatar Generator"
 
 ## Dev Notes
 
@@ -124,6 +124,37 @@ export default defineConfig({
 - Directory structure must match the architecture spec — missing directories will cause incorrect file placement in later stories
 - The `dist/` directory is gitignored (Vite default)
 - Do NOT install any state management libraries — use React hooks + Context API only
+
+## File List
+
+- `package.json` — Project manifest with Vite 6, React 18, TypeScript, testing deps
+- `vite.config.ts` — Vite config with React plugin, singlefile plugin, `@/` alias
+- `vitest.config.ts` — Vitest config with jsdom environment, globals, `@/` alias
+- `tsconfig.json` — Root TS config referencing app + node configs
+- `tsconfig.app.json` — App TS config with strict mode, `@/*` paths
+- `tsconfig.node.json` — Node TS config for vite.config.ts
+- `index.html` — Entry HTML with Google Fonts link, updated title
+- `src/main.tsx` — React entry point
+- `src/App.tsx` — Root component (basic scaffold)
+- `src/App.module.css` — Root CSS module (basic scaffold)
+- `src/vite-env.d.ts` — Vite type declarations
+- `src/test-setup.ts` — Test setup importing jest-dom matchers
+- `public/favicon.svg` — Favicon SVG
+- `.gitignore` — Git ignore rules
+
+## Change Log
+
+- 2026-05-18: Scaffolded project with Vite 6 + React 18 + TypeScript, single-file build config, `@/` path alias, directory structure, strict mode, Vitest + React Testing Library setup
+
+## Dev Agent Record
+
+**Implementation Notes:**
+- Created project files manually within existing workspace directory
+- Vite 6 + React 18 + TypeScript strict mode
+- Single-file build via vite-plugin-singlefile
+- `@/` path alias configured in vite + vitest configs and tsconfig
+- Separate vitest.config.ts to avoid Vite/Vitest type conflicts
+- Named exports pattern established in all components
 
 ## References
 

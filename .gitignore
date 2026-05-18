@@ -2,3 +2,7 @@
 .opencode
 .superpowers
 _bmad
+node_modules/
+dist/
+*.local
+*.tsbuildinfo

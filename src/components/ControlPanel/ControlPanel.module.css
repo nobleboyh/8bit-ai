@@ -1,0 +1,101 @@
+.generateRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.textarea {
+  flex: 1;
+  padding: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  resize: vertical;
+  min-height: 44px;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.forgeBtn {
+  padding: 14px;
+  border: 3px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 11px;
+  cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.forgeBtn:hover:not(:disabled) {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.forgeBtn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+}
+
+.forgeBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.forgeBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btnPrimary {
+  background: var(--accent);
+  color: #000;
+}
+
+.examplesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 9px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .generateRow {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 360px) {
+  .chip {
+    font-size: 8px;
+    padding: 6px 10px;
+  }
+}

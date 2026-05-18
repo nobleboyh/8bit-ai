@@ -1,0 +1,32 @@
+.viewer {
+  background: #000;
+  border: 4px solid var(--border);
+  box-shadow: 8px 8px 0 var(--shadow);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  image-rendering: pixelated;
+}
+
+.icon {
+  font-size: 48px;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.text {
+  font-family: var(--font-display);
+  font-size: clamp(8px, 2vw, 11px);
+  color: var(--muted);
+  text-align: center;
+  padding: 0 24px;
+}
+
+@media (max-width: 600px) {
+  .viewer {
+    min-height: 240px;
+  }
+}

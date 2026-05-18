@@ -1,0 +1,48 @@
+.wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.input {
+  flex: 1;
+  padding: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  min-height: 44px;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.toggle {
+  padding: 12px;
+  border: 3px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 10px;
+  cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.toggle:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.toggle:active {
+  transform: translate(2px, 2px);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

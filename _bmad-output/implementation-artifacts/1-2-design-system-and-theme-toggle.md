@@ -1,6 +1,6 @@
 # Story 1.2: Design System & Theme Toggle
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -20,42 +20,42 @@ So that the interface feels authentic and comfortable for my preference.
 
 ## Tasks / Subtasks
 
-- [ ] Create CSS custom properties for design tokens
-  - [ ] Define `:root` / `[data-theme="light"]` token values (parchment theme)
-  - [ ] Define `[data-theme="dark"]` token values (navy CRT theme)
-  - [ ] Define semantic token variables: `--bg`, `--surface`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-dim`, `--danger`, `--success`, `--scanline`, `--shadow`, `--font-display`, `--font-body`
-- [ ] Set up Google Fonts
-  - [ ] Add `<link>` for Press Start 2P in `index.html`
-  - [ ] Define `--font-display: 'Press Start 2P', monospace` in CSS
-  - [ ] Define `--font-body: 'Courier New', 'IBM Plex Mono', ui-monospace, monospace`
-- [ ] Create `useTheme` hook in `src/hooks/useTheme.ts`
-  - [ ] Read `localStorage.getItem('pixelforge-theme')` on init; default to `"light"`
-  - [ ] Set `document.documentElement.dataset.theme` on change
-  - [ ] Persist to `localStorage.setItem('pixelforge-theme', theme)` on toggle
-- [ ] Create `ThemeToggle` component
-  - [ ] File: `src/components/ThemeToggle/ThemeToggle.tsx`
-  - [ ] CSS module: `src/components/ThemeToggle/ThemeToggle.module.css`
-  - [ ] Test: `src/components/ThemeToggle/ThemeToggle.test.tsx`
-  - [ ] Button displays current theme label ("DARK" in light mode, "LIGHT" in dark mode)
-  - [ ] Click toggles between themes
-  - [ ] Minimum 44px touch target
-  - [ ] Accent-coloured focus border
-  - [ ] Hover: accent-dim background + accent border
-  - [ ] Active: translate 2px 2px
-- [ ] Add scanline overlay
-  - [ ] Apply `repeating-linear-gradient` to body/`::after` pseudo-element
-  - [ ] Light theme: `rgba(0,0,0,0.025)`
-  - [ ] Dark theme: `rgba(255,255,255,0.015)`
-- [ ] Add global base styles in `src/App.module.css` or `src/index.css`
-  - [ ] Body: `--bg` background, `--fg` text, `--font-body` stack
-  - [ ] Headings/labels: `--font-display` stack, uppercase by convention
-  - [ ] Inputs/buttons: 2px solid `--border`, accent focus
-  - [ ] All interactive elements: minimum 44px height
-- [ ] Write tests
-  - [ ] ThemeToggle renders with correct initial label
-  - [ ] Click toggles theme and updates localStorage
-  - [ ] Theme persists across page reload
-  - [ ] Scanline overlay is present in both themes
+- [x] Create CSS custom properties for design tokens
+  - [x] Define `:root` / `[data-theme="light"]` token values (parchment theme)
+  - [x] Define `[data-theme="dark"]` token values (navy CRT theme)
+  - [x] Define semantic token variables: `--bg`, `--surface`, `--fg`, `--muted`, `--border`, `--accent`, `--accent-dim`, `--danger`, `--success`, `--scanline`, `--shadow`, `--font-display`, `--font-body`
+- [x] Set up Google Fonts
+  - [x] Add `<link>` for Press Start 2P in `index.html`
+  - [x] Define `--font-display: 'Press Start 2P', monospace` in CSS
+  - [x] Define `--font-body: 'Courier New', 'IBM Plex Mono', ui-monospace, monospace`
+- [x] Create `useTheme` hook in `src/hooks/useTheme.ts`
+  - [x] Read `localStorage.getItem('pixelforge-theme')` on init; default to `"light"`
+  - [x] Set `document.documentElement.dataset.theme` on change
+  - [x] Persist to `localStorage.setItem('pixelforge-theme', theme)` on toggle
+- [x] Create `ThemeToggle` component
+  - [x] File: `src/components/ThemeToggle/ThemeToggle.tsx`
+  - [x] CSS module: `src/components/ThemeToggle/ThemeToggle.module.css`
+  - [x] Test: `src/components/ThemeToggle/ThemeToggle.test.tsx`
+  - [x] Button displays current theme label ("DARK" in light mode, "LIGHT" in dark mode)
+  - [x] Click toggles between themes
+  - [x] Minimum 44px touch target
+  - [x] Accent-coloured focus border
+  - [x] Hover: accent-dim background + accent border
+  - [x] Active: translate 2px 2px
+- [x] Add scanline overlay
+  - [x] Apply `repeating-linear-gradient` to body/`::after` pseudo-element
+  - [x] Light theme: `rgba(0,0,0,0.025)`
+  - [x] Dark theme: `rgba(255,255,255,0.015)`
+- [x] Add global base styles in `src/App.module.css` or `src/index.css`
+  - [x] Body: `--bg` background, `--fg` text, `--font-body` stack
+  - [x] Headings/labels: `--font-display` stack, uppercase by convention
+  - [x] Inputs/buttons: 2px solid `--border`, accent focus
+  - [x] All interactive elements: minimum 44px height
+- [x] Write tests
+  - [x] ThemeToggle renders with correct initial label
+  - [x] Click toggles theme and updates localStorage
+  - [x] Theme persists across page reload
+  - [x] Scanline overlay is present in both themes
 
 ## Dev Notes
 
@@ -183,6 +183,29 @@ src/
 - Test `useTheme` hook directly: init, toggle, localStorage read/write, theme attribute on document
 - Test `ThemeToggle` component: renders label, click fires toggle callback, button accessible by role
 - Tests co-located in `src/components/ThemeToggle/ThemeToggle.test.tsx`
+
+## File List
+
+- `src/hooks/useTheme.ts` — Theme state hook with localStorage persistence
+- `src/components/ThemeToggle/ThemeToggle.tsx` — Theme toggle button component
+- `src/components/ThemeToggle/ThemeToggle.module.css` — Toggle button styles
+- `src/components/ThemeToggle/ThemeToggle.test.tsx` — Toggle component tests (4)
+- `src/App.module.css` — Updated with design tokens (light/dark), scanline overlay, base styles
+- `src/App.tsx` — Updated to use useTheme hook and mount ThemeToggle
+- `index.html` — Added Google Fonts link for Press Start 2P
+
+## Change Log
+
+- 2026-05-18: Implemented design system with CSS custom properties for light/dark themes, Press Start 2P Google Fonts, useTheme hook with localStorage persistence, ThemeToggle component, scanline overlay, and global base styles
+
+## Dev Agent Record
+
+**Implementation Notes:**
+- Design tokens defined in `src/App.module.css` as CSS custom properties on `:root` / `[data-theme="light"]` and `[data-theme="dark"]`
+- Scanline overlay implemented as `body::after` pseudo-element with `pointer-events: none`
+- useTheme hook encapsulates localStorage read/write and `document.documentElement.dataset.theme` updates
+- ThemeToggle has 44px min-height, hover/active/focus-visible states
+- All 4 ThemeToggle tests passing
 
 ## References
 
