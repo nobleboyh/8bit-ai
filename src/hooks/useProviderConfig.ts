@@ -1,20 +1,24 @@
-import { useState, useCallback } from 'react'
-import { PROVIDER_PRESETS, type LLMProviderType, type ProviderConfig } from '@/types/pixelmap'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { PROVIDER_PRESETS, type LLMProviderType } from '@/types/pixelmap'
 
 const STORAGE_KEYS = {
   provider: 'pixelforge-provider',
   apiUrl: 'pixelforge-api-url',
   model: 'pixelforge-model',
-  apiKey: 'pixelforge-api-key',
 }
 
-function loadFromStorage(): Partial<ProviderConfig> {
+interface SavedConfig {
+  type?: LLMProviderType
+  apiUrl?: string
+  model?: string
+}
+
+function loadFromStorage(): SavedConfig {
   try {
     return {
       type: (localStorage.getItem(STORAGE_KEYS.provider) as LLMProviderType) || undefined,
       apiUrl: localStorage.getItem(STORAGE_KEYS.apiUrl) || undefined,
       model: localStorage.getItem(STORAGE_KEYS.model) || undefined,
-      apiKey: localStorage.getItem(STORAGE_KEYS.apiKey) || undefined,
     }
   } catch {
     return {}
@@ -27,7 +31,9 @@ function getPreset(type: LLMProviderType) {
 
 export function useProviderConfig() {
   const saved = loadFromStorage()
-  const initialType = saved.type || 'anthropic'
+  const initialType = saved.type && PROVIDER_PRESETS.some((p) => p.type === saved.type)
+    ? saved.type
+    : 'anthropic'
   const preset = getPreset(initialType)
 
   const [providerType, setProviderType] = useState<LLMProviderType>(initialType)
@@ -36,6 +42,13 @@ export function useProviderConfig() {
   const [overrideUrl, setOverrideUrl] = useState(!!saved.apiUrl)
   const [overrideModel, setOverrideModel] = useState(!!saved.model)
   const [savedNotice, setSavedNotice] = useState(false)
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    }
+  }, [])
 
   const handleProviderChange = useCallback(
     (type: LLMProviderType) => {
@@ -49,6 +62,11 @@ export function useProviderConfig() {
     [overrideUrl, overrideModel],
   )
 
+  const resetOverrides = useCallback(() => {
+    setOverrideUrl(false)
+    setOverrideModel(false)
+  }, [])
+
   const handleUrlChange = useCallback((url: string) => {
     setApiUrl(url)
     setOverrideUrl(true)
@@ -59,17 +77,17 @@ export function useProviderConfig() {
     setOverrideModel(true)
   }, [])
 
-  const saveToStorage = useCallback((apiKey: string) => {
+  const saveToStorage = useCallback(() => {
     try {
       localStorage.setItem(STORAGE_KEYS.provider, providerType)
       localStorage.setItem(STORAGE_KEYS.apiUrl, apiUrl)
       localStorage.setItem(STORAGE_KEYS.model, model)
-      if (apiKey) localStorage.setItem(STORAGE_KEYS.apiKey, apiKey)
     } catch {
       // localStorage may be full or unavailable
     }
     setSavedNotice(true)
-    setTimeout(() => setSavedNotice(false), 3000)
+    if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    noticeTimer.current = setTimeout(() => setSavedNotice(false), 3000)
   }, [providerType, apiUrl, model])
 
   return {
@@ -81,8 +99,6 @@ export function useProviderConfig() {
     setApiUrl: handleUrlChange,
     setModel: handleModelChange,
     saveToStorage,
-    setProviderTypeRaw: setProviderType,
-    setApiUrlRaw: setApiUrl,
-    setModelRaw: setModel,
+    resetOverrides,
   }
 }

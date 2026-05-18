@@ -20,13 +20,17 @@ export function ProviderSelect({ value, onChange }: ProviderSelectProps) {
         return
       }
       if (e.key === 'Enter' || e.key === ' ') {
-        if (!open) {
+        if (open) {
+          onChange(value)
+          setOpen(false)
+        } else {
           setOpen(true)
         }
         return
       }
       if (open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
         const idx = PROVIDER_PRESETS.findIndex((p) => p.type === value)
+        if (idx === -1 || PROVIDER_PRESETS.length === 0) return
         const next =
           e.key === 'ArrowDown'
             ? (idx + 1) % PROVIDER_PRESETS.length

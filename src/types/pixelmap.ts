@@ -4,7 +4,6 @@ export interface ProviderConfig {
   type: LLMProviderType
   apiUrl: string
   model: string
-  apiKey: string
 }
 
 export interface ProviderPreset {
@@ -18,13 +17,13 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     type: 'anthropic',
     label: 'Anthropic',
-    apiUrl: 'https://api.anthropic.com',
+    apiUrl: 'https://api.anthropic.com/v1',
     model: 'claude-sonnet-4-20250514',
   },
   {
     type: 'openai',
     label: 'OpenAI',
-    apiUrl: 'https://api.openai.com',
+    apiUrl: 'https://api.openai.com/v1',
     model: 'gpt-4o',
   },
   {
@@ -36,7 +35,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     type: 'deepseek',
     label: 'DeepSeek',
-    apiUrl: 'https://api.deepseek.com',
+    apiUrl: 'https://api.deepseek.com/v1',
     model: 'deepseek-v4-flash',
   },
 ]

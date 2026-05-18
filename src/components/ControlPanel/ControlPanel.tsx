@@ -25,17 +25,18 @@ export function ControlPanel({
   isGenerating,
   hasApiKey,
 }: ControlPanelProps) {
+  const disabled = isGenerating || !prompt.trim() || !hasApiKey
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (disabled) return
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault()
         onGenerate()
       }
     },
-    [onGenerate],
+    [onGenerate, disabled],
   )
-
-  const disabled = isGenerating || !prompt.trim() || !hasApiKey
 
   return (
     <div>

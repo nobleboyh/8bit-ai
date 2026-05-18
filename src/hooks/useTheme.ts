@@ -4,10 +4,18 @@ const STORAGE_KEY = 'pixelforge-theme'
 
 type Theme = 'light' | 'dark'
 
-export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(() => {
+function getStoredTheme(): Theme {
+  try {
     const stored = localStorage.getItem(STORAGE_KEY)
     return stored === 'dark' ? 'dark' : 'light'
+  } catch {
+    return 'light'
+  }
+}
+
+export function useTheme() {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    return getStoredTheme()
   })
 
   useEffect(() => {
@@ -17,7 +25,11 @@ export function useTheme() {
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => {
       const next = prev === 'light' ? 'dark' : 'light'
-      localStorage.setItem(STORAGE_KEY, next)
+      try {
+        localStorage.setItem(STORAGE_KEY, next)
+      } catch {
+        // localStorage may be full or unavailable
+      }
       return next
     })
   }, [])
