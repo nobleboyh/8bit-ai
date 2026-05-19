@@ -12,12 +12,12 @@ describe('usePixelGeneration', () => {
     vi.clearAllMocks()
   })
 
-  it('initial state has no pixelMap, not generating, no error, default type Wizard', () => {
+  it('initial state has no pixelMap, not generating, no error, no default type', () => {
     const { result } = renderHook(() => usePixelGeneration())
     expect(result.current.pixelMap).toBeNull()
     expect(result.current.isGenerating).toBe(false)
     expect(result.current.error).toBeNull()
-    expect(result.current.selectedType).toBe('Wizard')
+    expect(result.current.selectedType).toBe('')
   })
 
   it('setSelectedType updates selected type', () => {

@@ -6,7 +6,7 @@ export function usePixelGeneration() {
   const [pixelMap, setPixelMap] = useState<PixelMapResponse | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedType, setSelectedType] = useState<string>('Wizard')
+  const [selectedType, setSelectedType] = useState<string>('')
   const generatingRef = useRef(false)
 
   const generate = useCallback(async (

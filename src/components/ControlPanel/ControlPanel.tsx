@@ -44,10 +44,15 @@ export function ControlPanel({
 
   const handleChipClick = useCallback(
     (chip: typeof EXAMPLE_CHIPS[number]) => {
-      onTypeSelect(chip.label)
-      onPromptChange(chip.prompt)
+      if (selectedType === chip.label) {
+        onTypeSelect('')
+        onPromptChange('')
+      } else {
+        onTypeSelect(chip.label)
+        onPromptChange(chip.prompt)
+      }
     },
-    [onTypeSelect, onPromptChange],
+    [selectedType, onTypeSelect, onPromptChange],
   )
 
   return (

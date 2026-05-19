@@ -58,6 +58,16 @@ describe('ControlPanel', () => {
     expect(knightChip.className).toContain('chipSelected')
   })
 
+  it('clicking already-selected chip deselects and clears prompt', () => {
+    const onPromptChange = vi.fn()
+    const onTypeSelect = vi.fn()
+    render(<ControlPanel {...defaultProps} selectedType="Wizard" onPromptChange={onPromptChange} onTypeSelect={onTypeSelect} />)
+    const wizardChip = screen.getByLabelText('Wizard preset')
+    fireEvent.click(wizardChip)
+    expect(onTypeSelect).toHaveBeenCalledWith('')
+    expect(onPromptChange).toHaveBeenCalledWith('')
+  })
+
   it('calls onGenerate on FORGE click', () => {
     const onGenerate = vi.fn()
     render(<ControlPanel {...defaultProps} prompt="test" onGenerate={onGenerate} />)
