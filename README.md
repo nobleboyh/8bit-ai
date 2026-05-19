@@ -6,7 +6,7 @@ Generate retro 8-bit pixel avatars using LLMs (Anthropic, OpenAI, OpenAI-Compati
 
 ```
 ┌──────────────────────────────────────────────┐
-│  PIXELFORGE                      [DARK/LIGHT] │
+│  PIXELFORGE                      [DARK/LIGHT]│
 │  8-BIT AVATAR GENERATOR                      │
 ├──────────────────────────────────────────────┤
 │  01 // CONFIG                                │
@@ -14,7 +14,7 @@ Generate retro 8-bit pixel avatars using LLMs (Anthropic, OpenAI, OpenAI-Compati
 │  │ Provider    [Anthropic  ▼]             │  │
 │  │ API URL     [________________]         │  │
 │  │ Model       [________________]         │  │
-│  │ API Key     [********] [SHOW]         │  │
+│  │ API Key     [********] [SHOW]          │  │
 │  └────────────────────────────────────────┘  │
 ├──────────────────────────────────────────────┤
 │  02 // PROMPT                                │
