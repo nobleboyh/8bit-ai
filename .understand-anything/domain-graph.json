@@ -1,0 +1,822 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "pixelforge",
+    "languages": ["typescript", "css", "html", "javascript"],
+    "frameworks": ["React", "Vite", "Vitest"],
+    "description": "8-Bit Avatar Generator — Generate retro 8-bit pixel avatars using LLMs (Anthropic, OpenAI, OpenAI-Compatible, DeepSeek, Gemini). Fully client-side React/TypeScript app.",
+    "analyzedAt": "2026-06-02T12:00:00.000Z",
+    "gitCommitHash": "46ffba665559dd5891272bb07720f082bc7dbdcd"
+  },
+  "nodes": [
+    {
+      "id": "domain:llm-provider-integration",
+      "type": "domain",
+      "name": "LLM Provider Integration",
+      "summary": "Manages connections to external LLM providers including provider selection, API URL and model configuration, and API key management. Uses a strategy pattern with five provider implementations (Anthropic, OpenAI, OpenAI-Compatible, DeepSeek, Gemini) and persists configuration to localStorage and sessionStorage.",
+      "tags": ["provider", "configuration", "api-key", "llm", "strategy-pattern"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["LLMProvider", "ProviderConfig", "ProviderPreset", "LLMProviderType", "ApiKey"],
+        "businessRules": [
+          "API key must be set before generation (enforced by UI disabling FORGE button)",
+          "API key stored in sessionStorage only (cleared on tab close)",
+          "Provider URL and model auto-populate from presets on provider change",
+          "Custom URL/model overrides persist in localStorage and are preserved across provider switches",
+          "Settings auto-save to localStorage on every change"
+        ],
+        "crossDomainInteractions": [
+          "Provides configured provider type, URL, model, and API key to Avatar Generation domain",
+          "App.tsx wires useProviderConfig and useApiKey outputs into usePixelGeneration.generate() call"
+        ]
+      }
+    },
+    {
+      "id": "domain:avatar-generation",
+      "type": "domain",
+      "name": "Avatar Generation",
+      "summary": "The core domain that transforms a text prompt into a 16x16 pixel avatar via LLM. Handles prompt entry, character type selection via preset chips, LLM dispatch with provider routing, JSON response parsing with validation, and rendering the pixel grid as a CSS grid. Manages the full generation lifecycle with loading and error states.",
+      "tags": ["generation", "llm", "pixel-art", "prompt-engineering", "state-machine"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["PixelMapResponse", "PixelGenRequest", "Result", "AvatarGrid", "PresetChip", "ViewerState"],
+        "businessRules": [
+          "Cannot generate while already generating (generatingRef guard prevents race conditions)",
+          "Prompt must be non-empty and API key must be set for FORGE to be enabled",
+          "Cmd+Enter (Ctrl+Enter) keyboard shortcut triggers generation",
+          "System prompt enforces 16x16 grid with valid 6-digit hex colors and NES-inspired palette",
+          "LLM response must conform to PixelMapResponse schema (palette, grid, label) or parse error is returned",
+          "401 API errors surface a specific 'Invalid API key' message to the user"
+        ],
+        "crossDomainInteractions": [
+          "Consumes provider configuration from LLM Provider Integration domain",
+          "Feeds generated PixelMapResponse into Avatar Export domain for downloads",
+          "Viewer state machine (empty → loading → result | error) is delegated to UI & Theming domain"
+        ]
+      }
+    },
+    {
+      "id": "domain:avatar-export",
+      "type": "domain",
+      "name": "Avatar Export",
+      "summary": "Handles downloading generated pixel avatars in two formats: PNG (via OffscreenCanvas at 16x scale) and self-contained HTML file (with embedded CSS grid and inline styles). Both exports sanitize filenames for filesystem safety.",
+      "tags": ["export", "download", "png", "html", "file-generation"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["PNG Export", "HTML Export", "SanitizedFilename"],
+        "businessRules": [
+          "PNG uses OffscreenCanvas at 16x scale of the 16x16 grid (256x256 output)",
+          "HTML export is a fully self-contained document with embedded CSS and inline styles",
+          "Filenames are sanitized using a lowercase alphanumeric + dash transform",
+          "Exports are best-effort (silently fail on errors, e.g. unsupported browser)"
+        ],
+        "crossDomainInteractions": [
+          "Consumes PixelMapResponse from Avatar Generation domain as source data",
+          "Export buttons are rendered inside ViewerShell from UI & Theming domain"
+        ]
+      }
+    },
+    {
+      "id": "domain:user-interface-and-theming",
+      "type": "domain",
+      "name": "User Interface & Theming",
+      "summary": "Provides the app shell, layout structure, theme toggle (light/dark with localStorage persistence), and the viewer state machine (empty/loading/result/error). Orchestrates all UI components including header, config section, prompt section, and avatar viewer section.",
+      "tags": ["ui", "theming", "layout", "state-machine", "shell"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["AppShell", "ViewerState", "Theme", "Section Layout"],
+        "businessRules": [
+          "Theme is persisted to localStorage and applied via data-theme attribute on document element",
+          "Viewer follows a strict state machine: empty → loading → result | error",
+          "Re-Forge action resets the viewer back to empty state",
+          "App is divided into three labeled sections: 01 CONFIG, 02 PROMPT, 03 AVATAR"
+        ],
+        "crossDomainInteractions": [
+          "Wraps and displays components from all other domains",
+          "ViewerShell conditionally renders Avatar Grid (Avatar Generation), Loading Indicator, Error Display, and Export buttons (Avatar Export)"
+        ]
+      }
+    },
+    {
+      "id": "flow:configure-provider",
+      "type": "flow",
+      "name": "Configure Provider",
+      "summary": "User selects an LLM provider from a dropdown, which auto-populates the API URL and model fields from presets. The user can override these values, and all settings are automatically persisted to localStorage.",
+      "tags": ["provider", "configuration", "settings", "localStorage"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Provider select dropdown click",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:manage-api-key",
+      "type": "flow",
+      "name": "Manage API Key",
+      "summary": "User enters an API key in a password-masked input field with a show/hide toggle. The key is persisted to sessionStorage for the browser tab session only.",
+      "tags": ["api-key", "security", "sessionStorage", "authentication"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "API Key input field focus",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:generate-avatar",
+      "type": "flow",
+      "name": "Generate Avatar",
+      "summary": "The core generation flow: user enters a prompt (or selects a preset chip), optionally chooses a character type, clicks FORGE or presses Cmd+Enter. The system dispatches to the configured LLM provider, parses the JSON response, validates it, and renders the pixel grid. Shows loading state during generation and error state on failure.",
+      "tags": ["generation", "llm", "prompt", "pixel-art", "state-machine"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "FORGE button click or Cmd+Enter keyboard shortcut",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:export-png",
+      "type": "flow",
+      "name": "Export as PNG",
+      "summary": "User clicks the Download PNG button, which renders the pixel map onto an OffscreenCanvas at 16x scale, converts to a PNG Blob, and triggers a browser download with a sanitized filename.",
+      "tags": ["export", "png", "download", "canvas"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "DOWNLOAD PNG button click",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:export-html",
+      "type": "flow",
+      "name": "Export as HTML",
+      "summary": "User clicks the Download HTML button, which builds a fully self-contained HTML document with the pixel grid rendered as CSS divs, inline styles, and the character label. The HTML is served as a Blob download with a sanitized filename.",
+      "tags": ["export", "html", "download", "self-contained"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "DOWNLOAD HTML button click",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:toggle-theme",
+      "type": "flow",
+      "name": "Toggle Theme",
+      "summary": "User clicks the theme toggle button in the header, which switches between light and dark mode. The theme preference is persisted to localStorage and applied as a data-theme attribute on the document root element.",
+      "tags": ["theme", "appearance", "localStorage", "toggle"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "Theme toggle button click",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:navigate-viewer",
+      "type": "flow",
+      "name": "Navigate Viewer States",
+      "summary": "The viewer component acts as a state machine with four states: empty (initial placeholder), loading (animated pixel indicator), result (avatar grid + download buttons + re-forge), and error (error message with optional dismiss). User can trigger a re-forge to return to empty state.",
+      "tags": ["viewer", "state-machine", "ui", "navigation"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Viewer state change triggered by generation lifecycle",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:configure-provider:select-provider",
+      "type": "step",
+      "name": "Select Provider",
+      "summary": "User opens a custom dropdown and selects one of five LLM providers (Anthropic, OpenAI, OpenAI-Compatible, DeepSeek, Gemini). Selection auto-populates URL and model fields from preset defaults unless overridden.",
+      "tags": ["provider", "dropdown", "selection"],
+      "complexity": "simple",
+      "filePath": "src/components/ProviderSelect/ProviderSelect.tsx",
+      "lineRange": [10, 87]
+    },
+    {
+      "id": "step:configure-provider:update-api-url",
+      "type": "step",
+      "name": "Update API URL",
+      "summary": "User can override the auto-populated API URL with a custom endpoint. Overrides are tracked and preserved when switching providers.",
+      "tags": ["configuration", "url"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useProviderConfig.ts",
+      "lineRange": [80, 83]
+    },
+    {
+      "id": "step:configure-provider:update-model",
+      "type": "step",
+      "name": "Update Model",
+      "summary": "User can override the auto-populated model name with a custom model identifier. Overrides are tracked and preserved when switching providers.",
+      "tags": ["configuration", "model"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useProviderConfig.ts",
+      "lineRange": [85, 88]
+    },
+    {
+      "id": "step:configure-provider:auto-save-settings",
+      "type": "step",
+      "name": "Auto-Save Settings",
+      "summary": "Provider type, API URL, and model are automatically saved to localStorage on every change via a useEffect. A temporary 'Settings saved locally' notice is shown for 3 seconds.",
+      "tags": ["persistence", "localStorage", "auto-save"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useProviderConfig.ts",
+      "lineRange": [47, 61]
+    },
+    {
+      "id": "step:manage-api-key:enter-api-key",
+      "type": "step",
+      "name": "Enter API Key",
+      "summary": "User types their API key into a password-masked input field. The field supports show/hide visibility toggle.",
+      "tags": ["input", "security", "api-key"],
+      "complexity": "simple",
+      "filePath": "src/components/ApiKeyInput/ApiKeyInput.tsx",
+      "lineRange": [9, 31]
+    },
+    {
+      "id": "step:manage-api-key:toggle-visibility",
+      "type": "step",
+      "name": "Toggle Key Visibility",
+      "summary": "User clicks SHOW/HIDE button to toggle the API key input between masked (password) and visible (text) states.",
+      "tags": ["visibility", "toggle", "security"],
+      "complexity": "simple",
+      "filePath": "src/components/ApiKeyInput/ApiKeyInput.tsx",
+      "lineRange": [11, 28]
+    },
+    {
+      "id": "step:manage-api-key:persist-to-session",
+      "type": "step",
+      "name": "Persist to Session",
+      "summary": "API key is persisted to sessionStorage so it persists across page refreshes within the same browser tab session but is cleared on tab close.",
+      "tags": ["persistence", "sessionStorage"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useApiKey.ts",
+      "lineRange": [5, 49]
+    },
+    {
+      "id": "step:generate-avatar:enter-prompt",
+      "type": "step",
+      "name": "Enter Prompt",
+      "summary": "User types a character description into the textarea prompt field. The prompt is used to construct the full generation request sent to the LLM.",
+      "tags": ["prompt", "input", "textarea"],
+      "complexity": "simple",
+      "filePath": "src/components/ControlPanel/ControlPanel.tsx",
+      "lineRange": [60, 68]
+    },
+    {
+      "id": "step:generate-avatar:select-avatar-type",
+      "type": "step",
+      "name": "Select Avatar Type",
+      "summary": "User clicks a preset chip (Wizard, Knight, Robot, Astronaut, Ninja, Elf) which auto-fills the prompt with a detailed description and sets the character type label. Clicking the same chip again clears the selection.",
+      "tags": ["preset", "chip", "type-selection"],
+      "complexity": "simple",
+      "filePath": "src/components/ControlPanel/ControlPanel.tsx",
+      "lineRange": [45, 56]
+    },
+    {
+      "id": "step:generate-avatar:trigger-forge",
+      "type": "step",
+      "name": "Trigger FORGE",
+      "summary": "User clicks the FORGE button or presses Cmd+Enter (Ctrl+Enter) to initiate avatar generation. Button is disabled when generating, prompt is empty, or no API key is set.",
+      "tags": ["action", "trigger", "keyboard-shortcut"],
+      "complexity": "simple",
+      "filePath": "src/components/ControlPanel/ControlPanel.tsx",
+      "lineRange": [34, 43]
+    },
+    {
+      "id": "step:generate-avatar:dispatch-generation",
+      "type": "step",
+      "name": "Dispatch Generation",
+      "summary": "App.tsx constructs the full prompt by prepending type context, then calls generate() on usePixelGeneration hook with the prompt and provider config. The hook guards against concurrent generations via a ref flag.",
+      "tags": ["dispatch", "hook", "orchestration"],
+      "complexity": "moderate",
+      "filePath": "src/App.tsx",
+      "lineRange": [38, 42]
+    },
+    {
+      "id": "step:generate-avatar:route-to-provider",
+      "type": "step",
+      "name": "Route to Provider",
+      "summary": "llmClient.generate() looks up the appropriate provider implementation from a lazy-initialized registry using the provider type string and delegates the PixelGenRequest to it.",
+      "tags": ["routing", "strategy-pattern", "dispatch"],
+      "complexity": "simple",
+      "filePath": "src/services/llmClient.ts",
+      "lineRange": [24, 36]
+    },
+    {
+      "id": "step:generate-avatar:call-provider-api",
+      "type": "step",
+      "name": "Call Provider API",
+      "summary": "The selected provider implementation (AnthropicProvider, OpenAIProvider, OpenAICompatibleProvider, DeepSeekProvider, or GeminiProvider) sends an HTTP request to its specific API endpoint with provider-specific headers, system prompt, and user prompt.",
+      "tags": ["api", "http", "llm", "provider"],
+      "complexity": "moderate",
+      "filePath": "src/services/AnthropicProvider.ts",
+      "lineRange": [7, 56]
+    },
+    {
+      "id": "step:generate-avatar:parse-llm-response",
+      "type": "step",
+      "name": "Parse LLM Response",
+      "summary": "parsePixelMapResponse() validates the raw LLM JSON output against the PixelMapResponse schema: checks palette is array of valid hex colors, grid is square array of hex colors, label is non-empty string. Returns Result tagged union with parse errors on failure.",
+      "tags": ["parsing", "validation", "json", "schema"],
+      "complexity": "moderate",
+      "filePath": "src/services/parseResponse.ts",
+      "lineRange": [5, 32]
+    },
+    {
+      "id": "step:generate-avatar:set-pixel-map-state",
+      "type": "step",
+      "name": "Set Pixel Map State",
+      "summary": "On successful parsing, the PixelMapResponse is stored in React state via setPixelMap, which triggers a re-render to display the avatar grid.",
+      "tags": ["state", "react", "update"],
+      "complexity": "simple",
+      "filePath": "src/hooks/usePixelGeneration.ts",
+      "lineRange": [29, 30]
+    },
+    {
+      "id": "step:generate-avatar:render-avatar-grid",
+      "type": "step",
+      "name": "Render Avatar Grid",
+      "summary": "AvatarGrid renders the 16x16 pixel map as a CSS grid with dynamic gridTemplateColumns. Each cell is a colored div. The grid is displayed at 256x256px. Shows character label and metadata (grid size + color count).",
+      "tags": ["render", "grid", "pixel-art", "css"],
+      "complexity": "simple",
+      "filePath": "src/components/AvatarGrid/AvatarGrid.tsx",
+      "lineRange": [9, 39]
+    },
+    {
+      "id": "step:generate-avatar:show-loading",
+      "type": "step",
+      "name": "Show Loading Indicator",
+      "summary": "During generation, the viewer displays an animated pixel loading indicator with 'GENERATING...' text, providing visual feedback to the user.",
+      "tags": ["loading", "animation", "feedback"],
+      "complexity": "simple",
+      "filePath": "src/components/LoadingIndicator/LoadingIndicator.tsx",
+      "lineRange": [3, 10]
+    },
+    {
+      "id": "step:generate-avatar:handle-errors",
+      "type": "step",
+      "name": "Handle and Display Errors",
+      "summary": "On generation failure (API error, network error, parse error), the error message is surfaced in ErrorDisplay with an optional dismiss button. 401 errors get a user-friendly 'Invalid API key' message.",
+      "tags": ["error", "handling", "feedback"],
+      "complexity": "simple",
+      "filePath": "src/components/ErrorDisplay/ErrorDisplay.tsx",
+      "lineRange": [8, 19]
+    },
+    {
+      "id": "step:export-png:click-download-png",
+      "type": "step",
+      "name": "Click Download PNG",
+      "summary": "User clicks the DOWNLOAD PNG button, which calls exportAsPng() with the current pixel map, type, and name.",
+      "tags": ["action", "download", "trigger"],
+      "complexity": "simple",
+      "filePath": "src/components/DownloadButton/DownloadButton.tsx",
+      "lineRange": [12, 28]
+    },
+    {
+      "id": "step:export-png:render-offscreen-canvas",
+      "type": "step",
+      "name": "Render to OffscreenCanvas",
+      "summary": "Creates an OffscreenCanvas at 16x scale of the pixel grid (256x256 for a 16x16 grid) and draws each pixel cell as a filled rectangle using the grid's hex colors.",
+      "tags": ["canvas", "rendering", "scaling"],
+      "complexity": "simple",
+      "filePath": "src/utils/pngExport.ts",
+      "lineRange": [3, 15]
+    },
+    {
+      "id": "step:export-png:download-blob",
+      "type": "step",
+      "name": "Download PNG Blob",
+      "summary": "Converts the OffscreenCanvas to a PNG Blob, creates an object URL, generates a sanitized filename (pixelforce-{type}-{name}.png), and triggers a programmatic download via a hidden anchor element.",
+      "tags": ["blob", "download", "file"],
+      "complexity": "simple",
+      "filePath": "src/utils/pngExport.ts",
+      "lineRange": [17, 36]
+    },
+    {
+      "id": "step:export-html:click-download-html",
+      "type": "step",
+      "name": "Click Download HTML",
+      "summary": "User clicks the DOWNLOAD HTML button, which calls htmlExport() with the grid data, label, prefix, and username.",
+      "tags": ["action", "download", "trigger"],
+      "complexity": "simple",
+      "filePath": "src/components/DownloadButton/DownloadHtmlButton.tsx",
+      "lineRange": [11, 23]
+    },
+    {
+      "id": "step:export-html:build-html-document",
+      "type": "step",
+      "name": "Build HTML Document",
+      "summary": "buildAvatarHTML() generates a fully self-contained HTML document with embedded CSS styles (grid layout, centering, monospace font, beige background), inline pixel divs with validated hex colors, and an escaped character label.",
+      "tags": ["generation", "html", "template", "self-contained"],
+      "complexity": "moderate",
+      "filePath": "src/utils/buildAvatarHTML.ts",
+      "lineRange": [14, 78]
+    },
+    {
+      "id": "step:export-html:download-blob",
+      "type": "step",
+      "name": "Download HTML Blob",
+      "summary": "Wraps the generated HTML string in a Blob with text/html MIME type, creates an object URL, generates a sanitized filename (pixelforce-{prefix}-{username}.html), and triggers a programmatic download via a hidden anchor element.",
+      "tags": ["blob", "download", "file"],
+      "complexity": "simple",
+      "filePath": "src/utils/htmlExport.ts",
+      "lineRange": [4, 31]
+    },
+    {
+      "id": "step:toggle-theme:click-toggle",
+      "type": "step",
+      "name": "Click Theme Toggle",
+      "summary": "User clicks the DARK/LIGHT button in the header to toggle between dark and light themes. The button label updates to reflect the opposite theme.",
+      "tags": ["toggle", "button", "theme"],
+      "complexity": "simple",
+      "filePath": "src/components/ThemeToggle/ThemeToggle.tsx",
+      "lineRange": [8, 18]
+    },
+    {
+      "id": "step:toggle-theme:apply-theme",
+      "type": "step",
+      "name": "Apply Theme",
+      "summary": "The active theme is applied to the UI by setting the data-theme attribute on document.documentElement via a useEffect running on theme state changes.",
+      "tags": ["theme", "css", "attribute"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useTheme.ts",
+      "lineRange": [21, 23]
+    },
+    {
+      "id": "step:toggle-theme:persist-preference",
+      "type": "step",
+      "name": "Persist Theme Preference",
+      "summary": "Theme selection is persisted to localStorage under the key 'pixelforge-theme' so the user's preference is restored on subsequent visits.",
+      "tags": ["persistence", "localStorage"],
+      "complexity": "simple",
+      "filePath": "src/hooks/useTheme.ts",
+      "lineRange": [25, 36]
+    },
+    {
+      "id": "step:navigate-viewer:show-empty-state",
+      "type": "step",
+      "name": "Show Empty State",
+      "summary": "When no generation has been performed, the viewer shows a decorative icon and the text 'ENTER A PROMPT & FORGE YOUR PIXEL' as an initial call to action.",
+      "tags": ["placeholder", "empty-state", "ui"],
+      "complexity": "simple",
+      "filePath": "src/components/ViewerShell/ViewerShell.tsx",
+      "lineRange": [61, 66]
+    },
+    {
+      "id": "step:navigate-viewer:show-loading-state",
+      "type": "step",
+      "name": "Show Loading State",
+      "summary": "During active generation, the viewer switches to the LoadingIndicator component showing an animated pixel with 'GENERATING...' text.",
+      "tags": ["loading", "state", "ui"],
+      "complexity": "simple",
+      "filePath": "src/components/ViewerShell/ViewerShell.tsx",
+      "lineRange": [30, 36]
+    },
+    {
+      "id": "step:navigate-viewer:show-result-state",
+      "type": "step",
+      "name": "Show Result State",
+      "summary": "On successful generation, the viewer displays the AvatarGrid (pixel map with metadata), action buttons for PNG download, HTML download, and a RE-FORGE button to start fresh.",
+      "tags": ["result", "display", "actions", "ui"],
+      "complexity": "simple",
+      "filePath": "src/components/ViewerShell/ViewerShell.tsx",
+      "lineRange": [46, 57]
+    },
+    {
+      "id": "step:navigate-viewer:show-error-state",
+      "type": "step",
+      "name": "Show Error State",
+      "summary": "On generation failure, the viewer displays the ErrorDisplay component with the error message and an optional dismiss button.",
+      "tags": ["error", "display", "ui"],
+      "complexity": "simple",
+      "filePath": "src/components/ViewerShell/ViewerShell.tsx",
+      "lineRange": [38, 44]
+    },
+    {
+      "id": "step:navigate-viewer:re-forge",
+      "type": "step",
+      "name": "Re-Forge Action",
+      "summary": "User clicks the RE-FORGE button to reset the viewer back to the empty state, clearing the pixel map, error, and generation state via the reset() callback.",
+      "tags": ["reset", "action", "ui"],
+      "complexity": "simple",
+      "filePath": "src/App.tsx",
+      "lineRange": [44, 46]
+    }
+  ],
+  "edges": [
+    {
+      "source": "domain:llm-provider-integration",
+      "target": "flow:configure-provider",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "domain:llm-provider-integration",
+      "target": "flow:manage-api-key",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "domain:avatar-generation",
+      "target": "flow:generate-avatar",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "domain:avatar-export",
+      "target": "flow:export-png",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:avatar-export",
+      "target": "flow:export-html",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "domain:user-interface-and-theming",
+      "target": "flow:toggle-theme",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:user-interface-and-theming",
+      "target": "flow:navigate-viewer",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "flow:configure-provider",
+      "target": "step:configure-provider:select-provider",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:configure-provider",
+      "target": "step:configure-provider:update-api-url",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:configure-provider",
+      "target": "step:configure-provider:update-model",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:configure-provider",
+      "target": "step:configure-provider:auto-save-settings",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "flow:manage-api-key",
+      "target": "step:manage-api-key:enter-api-key",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.3
+    },
+    {
+      "source": "flow:manage-api-key",
+      "target": "step:manage-api-key:toggle-visibility",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:manage-api-key",
+      "target": "step:manage-api-key:persist-to-session",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:enter-prompt",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.1
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:select-avatar-type",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:trigger-forge",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.3
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:dispatch-generation",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.4
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:route-to-provider",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:call-provider-api",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:parse-llm-response",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:set-pixel-map-state",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:render-avatar-grid",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:show-loading",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "flow:generate-avatar",
+      "target": "step:generate-avatar:handle-errors",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "flow:export-png",
+      "target": "step:export-png:click-download-png",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.3
+    },
+    {
+      "source": "flow:export-png",
+      "target": "step:export-png:render-offscreen-canvas",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:export-png",
+      "target": "step:export-png:download-blob",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "flow:export-html",
+      "target": "step:export-html:click-download-html",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.3
+    },
+    {
+      "source": "flow:export-html",
+      "target": "step:export-html:build-html-document",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:export-html",
+      "target": "step:export-html:download-blob",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "flow:toggle-theme",
+      "target": "step:toggle-theme:click-toggle",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.3
+    },
+    {
+      "source": "flow:toggle-theme",
+      "target": "step:toggle-theme:apply-theme",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:toggle-theme",
+      "target": "step:toggle-theme:persist-preference",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "flow:navigate-viewer",
+      "target": "step:navigate-viewer:show-empty-state",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:navigate-viewer",
+      "target": "step:navigate-viewer:show-loading-state",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.4
+    },
+    {
+      "source": "flow:navigate-viewer",
+      "target": "step:navigate-viewer:show-result-state",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:navigate-viewer",
+      "target": "step:navigate-viewer:show-error-state",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:navigate-viewer",
+      "target": "step:navigate-viewer:re-forge",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "domain:llm-provider-integration",
+      "target": "domain:avatar-generation",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Provides configured provider type, API URL, model, and API key used by the generation flow",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:avatar-generation",
+      "target": "domain:avatar-export",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Generated PixelMapResponse is consumed by PNG and HTML export flows",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:user-interface-and-theming",
+      "target": "domain:llm-provider-integration",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "App shell renders provider config and API key UI sections",
+      "weight": 0.4
+    },
+    {
+      "source": "domain:user-interface-and-theming",
+      "target": "domain:avatar-generation",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Viewer shell dispatches generation, shows loading/error states, and renders avatar grid",
+      "weight": 0.5
+    },
+    {
+      "source": "domain:user-interface-and-theming",
+      "target": "domain:avatar-export",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Viewer shell renders download buttons for PNG and HTML export",
+      "weight": 0.3
+    }
+  ],
+  "layers": [],
+  "tour": []
+}

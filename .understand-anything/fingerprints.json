@@ -1,0 +1,1877 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "64482fea01afd237b59d81e8173efd4e80546509",
+  "generatedAt": "2026-06-01T04:45:17.013Z",
+  "files": {
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "5c9e733ea3de323025677cb03899a117d2bce9bbca9b59e408c4cf03f62c5259",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": false
+    },
+    "src/App.tsx": {
+      "filePath": "src/App.tsx",
+      "contentHash": "6a6649b7bca6260bf4b363a53c1e822f078bad71dcb3e88877335054b3470cb5",
+      "functions": [
+        {
+          "name": "App",
+          "params": [],
+          "exported": true,
+          "lineCount": 115
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@/hooks/useTheme",
+          "specifiers": [
+            "useTheme"
+          ]
+        },
+        {
+          "source": "@/hooks/useApiKey",
+          "specifiers": [
+            "useApiKey"
+          ]
+        },
+        {
+          "source": "@/hooks/useProviderConfig",
+          "specifiers": [
+            "useProviderConfig"
+          ]
+        },
+        {
+          "source": "@/hooks/usePixelGeneration",
+          "specifiers": [
+            "usePixelGeneration"
+          ]
+        },
+        {
+          "source": "@/components/ThemeToggle/ThemeToggle",
+          "specifiers": [
+            "ThemeToggle"
+          ]
+        },
+        {
+          "source": "@/components/ApiKeyInput/ApiKeyInput",
+          "specifiers": [
+            "ApiKeyInput"
+          ]
+        },
+        {
+          "source": "@/components/ProviderSelect/ProviderSelect",
+          "specifiers": [
+            "ProviderSelect"
+          ]
+        },
+        {
+          "source": "@/components/ControlPanel/ControlPanel",
+          "specifiers": [
+            "ControlPanel"
+          ]
+        },
+        {
+          "source": "@/components/ViewerShell/ViewerShell",
+          "specifiers": [
+            "ViewerShell"
+          ]
+        },
+        {
+          "source": "./App.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "App"
+      ],
+      "totalLines": 128,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ApiKeyInput/ApiKeyInput.test.tsx": {
+      "filePath": "src/components/ApiKeyInput/ApiKeyInput.test.tsx",
+      "contentHash": "2b205218814a8bb4af1f880905e46abee54b6ae9465c2d41e9f16fd38b1065c5",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./ApiKeyInput",
+          "specifiers": [
+            "ApiKeyInput"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ApiKeyInput/ApiKeyInput.tsx": {
+      "filePath": "src/components/ApiKeyInput/ApiKeyInput.tsx",
+      "contentHash": "5bde9ce04e199f769e502e60a82ba3150316abefb42cdcb78b93e5fd8b7ed3a4",
+      "functions": [
+        {
+          "name": "ApiKeyInput",
+          "params": [
+            "{ apiKey, onChange }"
+          ],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "./ApiKeyInput.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ApiKeyInput"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/AvatarGrid/AvatarGrid.test.tsx": {
+      "filePath": "src/components/AvatarGrid/AvatarGrid.test.tsx",
+      "contentHash": "4c3e90ffa5665aba7ad6fdd2d2f28ed18bb08fd3e6003ed5db1641e9fbac060c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen"
+          ]
+        },
+        {
+          "source": "./AvatarGrid",
+          "specifiers": [
+            "AvatarGrid"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/AvatarGrid/AvatarGrid.tsx": {
+      "filePath": "src/components/AvatarGrid/AvatarGrid.tsx",
+      "contentHash": "c82fe0913e3095a4a28d1ed14fd3dedd92caa10f7b42611a7aa9bd104e3409f4",
+      "functions": [
+        {
+          "name": "AvatarGrid",
+          "params": [
+            "{ pixelMap, type }"
+          ],
+          "exported": true,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse"
+          ]
+        },
+        {
+          "source": "./AvatarGrid.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "AvatarGrid"
+      ],
+      "totalLines": 40,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ControlPanel/ControlPanel.test.tsx": {
+      "filePath": "src/components/ControlPanel/ControlPanel.test.tsx",
+      "contentHash": "947a99209f94446e24b44aba2e87a64afc5bddb8f5406f9b690cf1a50c2a7511",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./ControlPanel",
+          "specifiers": [
+            "ControlPanel"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 98,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ControlPanel/ControlPanel.tsx": {
+      "filePath": "src/components/ControlPanel/ControlPanel.tsx",
+      "contentHash": "5e21ee3b92db411b56bc0ee957e274c25d0bd0d9e1208f3d2dad68ae9fe28e35",
+      "functions": [
+        {
+          "name": "ControlPanel",
+          "params": [
+            "{\n  prompt,\n  onPromptChange,\n  onGenerate,\n  isGenerating,\n  hasApiKey,\n  selectedType,\n  onTypeSelect,\n}"
+          ],
+          "exported": true,
+          "lineCount": 71
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useCallback"
+          ]
+        },
+        {
+          "source": "./ControlPanel.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ControlPanel"
+      ],
+      "totalLines": 94,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/DownloadButton/DownloadButton.test.tsx": {
+      "filePath": "src/components/DownloadButton/DownloadButton.test.tsx",
+      "contentHash": "68e566803e700b3861fd99bf42939b77a0d658f6559fb8fd690862294042af1a",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./DownloadButton",
+          "specifiers": [
+            "DownloadButton"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/DownloadButton/DownloadButton.tsx": {
+      "filePath": "src/components/DownloadButton/DownloadButton.tsx",
+      "contentHash": "58eb8cd93010aed16c422043692af384b73080ba5d198b2aa36be4bf921a8110",
+      "functions": [
+        {
+          "name": "DownloadButton",
+          "params": [
+            "{ pixelMap, type, name }"
+          ],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/utils/pngExport",
+          "specifiers": [
+            "exportAsPng"
+          ]
+        },
+        {
+          "source": "./DownloadButton.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "DownloadButton"
+      ],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/DownloadButton/DownloadHtmlButton.test.tsx": {
+      "filePath": "src/components/DownloadButton/DownloadHtmlButton.test.tsx",
+      "contentHash": "edc8901cf9e513461c3f198a4cb35b7134cfd8dadf4b649a003d341595ccee72",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./DownloadHtmlButton",
+          "specifiers": [
+            "DownloadHtmlButton"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/DownloadButton/DownloadHtmlButton.tsx": {
+      "filePath": "src/components/DownloadButton/DownloadHtmlButton.tsx",
+      "contentHash": "16a623a9ea2015804abd90dc0c562071c122b172b00f5c464c994699fc1b5e40",
+      "functions": [
+        {
+          "name": "DownloadHtmlButton",
+          "params": [
+            "{ pixelMap, prefix, username }"
+          ],
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/utils/htmlExport",
+          "specifiers": [
+            "htmlExport"
+          ]
+        },
+        {
+          "source": "./DownloadHtmlButton.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "DownloadHtmlButton"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ErrorDisplay/ErrorDisplay.test.tsx": {
+      "filePath": "src/components/ErrorDisplay/ErrorDisplay.test.tsx",
+      "contentHash": "f756c94198add0dd4417ac2335e2e09c564911eccf0153a86a0285e319e11db9",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./ErrorDisplay",
+          "specifiers": [
+            "ErrorDisplay"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ErrorDisplay/ErrorDisplay.tsx": {
+      "filePath": "src/components/ErrorDisplay/ErrorDisplay.tsx",
+      "contentHash": "e4209e5356850275c8a749a5b9786264017c70ebfd53c543e4f469e4ec991ed5",
+      "functions": [
+        {
+          "name": "ErrorDisplay",
+          "params": [
+            "{ message, onDismiss }"
+          ],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./ErrorDisplay.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ErrorDisplay"
+      ],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/LoadingIndicator/LoadingIndicator.test.tsx": {
+      "filePath": "src/components/LoadingIndicator/LoadingIndicator.test.tsx",
+      "contentHash": "0fcb6988a22468cf4d0d7a0b2674ab83ccc3027bff6e0351e60e34892d395d46",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen"
+          ]
+        },
+        {
+          "source": "./LoadingIndicator",
+          "specifiers": [
+            "LoadingIndicator"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/LoadingIndicator/LoadingIndicator.tsx": {
+      "filePath": "src/components/LoadingIndicator/LoadingIndicator.tsx",
+      "contentHash": "66f550f63faca5020332eefac6d6b4b83cf37f9e06726423fbfd0d283c8a495a",
+      "functions": [
+        {
+          "name": "LoadingIndicator",
+          "params": [],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./LoadingIndicator.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "LoadingIndicator"
+      ],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ProviderSelect/ProviderSelect.test.tsx": {
+      "filePath": "src/components/ProviderSelect/ProviderSelect.test.tsx",
+      "contentHash": "2541cd33a9a4062882ca6f788c508209d3922222c3a200aa31a61d71bb9ff1ff",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./ProviderSelect",
+          "specifiers": [
+            "ProviderSelect"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ProviderSelect/ProviderSelect.tsx": {
+      "filePath": "src/components/ProviderSelect/ProviderSelect.tsx",
+      "contentHash": "066e899748c3d0be273f1389e0b6d6d0ebf04dd24579f6ef4d7bce9c69b30678",
+      "functions": [
+        {
+          "name": "ProviderSelect",
+          "params": [
+            "{ value, onChange }"
+          ],
+          "exported": true,
+          "lineCount": 78
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useRef",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PROVIDER_PRESETS",
+            "LLMProviderType"
+          ]
+        },
+        {
+          "source": "./ProviderSelect.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ProviderSelect"
+      ],
+      "totalLines": 88,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ThemeToggle/ThemeToggle.test.tsx": {
+      "filePath": "src/components/ThemeToggle/ThemeToggle.test.tsx",
+      "contentHash": "9d4ef4de152568ff9225e4236cb65d778bf5138112886d528a1a5a9f09b991b2",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen",
+            "fireEvent"
+          ]
+        },
+        {
+          "source": "./ThemeToggle",
+          "specifiers": [
+            "ThemeToggle"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ThemeToggle/ThemeToggle.tsx": {
+      "filePath": "src/components/ThemeToggle/ThemeToggle.tsx",
+      "contentHash": "c715fa6bd27f9afce9c831ac2a7e8240bc66fd0ea8637290ef3b92de30d218ef",
+      "functions": [
+        {
+          "name": "ThemeToggle",
+          "params": [
+            "{ theme, onToggle }"
+          ],
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./ThemeToggle.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ThemeToggle"
+      ],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ViewerShell/ViewerShell.test.tsx": {
+      "filePath": "src/components/ViewerShell/ViewerShell.test.tsx",
+      "contentHash": "6b657daac35530045c8938ee0b23a24f80e586eb4b4c06c8ca70647103ab78ef",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "render",
+            "screen"
+          ]
+        },
+        {
+          "source": "./ViewerShell",
+          "specifiers": [
+            "ViewerShell"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 61,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ViewerShell/ViewerShell.tsx": {
+      "filePath": "src/components/ViewerShell/ViewerShell.tsx",
+      "contentHash": "e54ed3ddd247c303414a102729cdffed6e5aacf60d684445a922ae94d7f2adb9",
+      "functions": [
+        {
+          "name": "ViewerShell",
+          "params": [
+            "{\n  state,\n  pixelMap,\n  isGenerating,\n  error,\n  selectedType,\n  prompt,\n  onReForge,\n}"
+          ],
+          "exported": true,
+          "lineCount": 47
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/components/ErrorDisplay/ErrorDisplay",
+          "specifiers": [
+            "ErrorDisplay"
+          ]
+        },
+        {
+          "source": "@/components/AvatarGrid/AvatarGrid",
+          "specifiers": [
+            "AvatarGrid"
+          ]
+        },
+        {
+          "source": "@/components/LoadingIndicator/LoadingIndicator",
+          "specifiers": [
+            "LoadingIndicator"
+          ]
+        },
+        {
+          "source": "@/components/DownloadButton/DownloadButton",
+          "specifiers": [
+            "DownloadButton"
+          ]
+        },
+        {
+          "source": "@/components/DownloadButton/DownloadHtmlButton",
+          "specifiers": [
+            "DownloadHtmlButton"
+          ]
+        },
+        {
+          "source": "./ViewerShell.module.css",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "ViewerShell"
+      ],
+      "totalLines": 68,
+      "hasStructuralAnalysis": true
+    },
+    "src/hooks/useApiKey.ts": {
+      "filePath": "src/hooks/useApiKey.ts",
+      "contentHash": "70873bf0c7e8a77ac3e944f26d2a48bb911ea3fe5929c4e10ec6c6ea0f83c9d7",
+      "functions": [
+        {
+          "name": "getSessionKey",
+          "params": [],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "setSessionKey",
+          "params": [
+            "key"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "removeSessionKey",
+          "params": [],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "useApiKey",
+          "params": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback"
+          ]
+        }
+      ],
+      "exports": [
+        "useApiKey"
+      ],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    "src/hooks/usePixelGeneration.test.ts": {
+      "filePath": "src/hooks/usePixelGeneration.test.ts",
+      "contentHash": "76396e0c096cb765f3bb68e2eadccc01f5f74918179f4a30c9f9db5cbf4945f7",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "@testing-library/react",
+          "specifiers": [
+            "renderHook",
+            "act"
+          ]
+        },
+        {
+          "source": "./usePixelGeneration",
+          "specifiers": [
+            "usePixelGeneration"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 121,
+      "hasStructuralAnalysis": true
+    },
+    "src/hooks/usePixelGeneration.ts": {
+      "filePath": "src/hooks/usePixelGeneration.ts",
+      "contentHash": "a3a75a51c6da63c3f606f0dcf3f9cd27048478683d91f131a8a6c110aeb73753",
+      "functions": [
+        {
+          "name": "usePixelGeneration",
+          "params": [],
+          "exported": true,
+          "lineCount": 46
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback",
+            "useRef"
+          ]
+        },
+        {
+          "source": "@/services/llmClient",
+          "specifiers": [
+            "llmGenerate"
+          ]
+        },
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse",
+            "LLMProviderType"
+          ]
+        }
+      ],
+      "exports": [
+        "usePixelGeneration"
+      ],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "src/hooks/useProviderConfig.ts": {
+      "filePath": "src/hooks/useProviderConfig.ts",
+      "contentHash": "d9d5ad0e52a70e6ee1a649e5458f38bc00f214607fc31fc5a546ad74ab0cfee8",
+      "functions": [
+        {
+          "name": "loadFromStorage",
+          "params": [],
+          "returnType": "SavedConfig",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "getPreset",
+          "params": [
+            "type"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "useProviderConfig",
+          "params": [],
+          "exported": true,
+          "lineCount": 83
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback",
+            "useRef",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PROVIDER_PRESETS",
+            "LLMProviderType"
+          ]
+        }
+      ],
+      "exports": [
+        "useProviderConfig"
+      ],
+      "totalLines": 115,
+      "hasStructuralAnalysis": true
+    },
+    "src/hooks/useTheme.ts": {
+      "filePath": "src/hooks/useTheme.ts",
+      "contentHash": "639413e70a2c2197386244454d5148686f77aea3aaf5780960730fd5f14a1780",
+      "functions": [
+        {
+          "name": "getStoredTheme",
+          "params": [],
+          "returnType": "Theme",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "useTheme",
+          "params": [],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback",
+            "useEffect"
+          ]
+        }
+      ],
+      "exports": [
+        "useTheme"
+      ],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "src/main.tsx": {
+      "filePath": "src/main.tsx",
+      "contentHash": "15eb8d1ef69f4d53e96c0e2f8642cc5c300469f1a83671fdc874d30da4069d63",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "StrictMode"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "createRoot"
+          ]
+        },
+        {
+          "source": "./App",
+          "specifiers": [
+            "App"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/AnthropicProvider.test.ts": {
+      "filePath": "src/services/AnthropicProvider.test.ts",
+      "contentHash": "608a59bfacaacb1425cc5117de3df02f735e8646ad599d5ffe8e2de88ac13e1a",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./AnthropicProvider",
+          "specifiers": [
+            "AnthropicProvider"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 133,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/AnthropicProvider.ts": {
+      "filePath": "src/services/AnthropicProvider.ts",
+      "contentHash": "0cfdb43c7eeb0dc4756c4f60c4d98d2bec5a3d2907c84285a1a1f5e4e6df39f6",
+      "functions": [],
+      "classes": [
+        {
+          "name": "AnthropicProvider",
+          "methods": [
+            "generate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 51
+        }
+      ],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result",
+            "AppError"
+          ]
+        },
+        {
+          "source": "@/services/providers",
+          "specifiers": [
+            "LLMProvider"
+          ]
+        },
+        {
+          "source": "@/services/parseResponse",
+          "specifiers": [
+            "parsePixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/services/constants",
+          "specifiers": [
+            "SYSTEM_PROMPT"
+          ]
+        }
+      ],
+      "exports": [
+        "AnthropicProvider"
+      ],
+      "totalLines": 57,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/constants.ts": {
+      "filePath": "src/services/constants.ts",
+      "contentHash": "1e5236a0a828ddca6caea5308222469696dd32c240a046fea49a219bf222b6ba",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "SYSTEM_PROMPT"
+      ],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/DeepSeekProvider.test.ts": {
+      "filePath": "src/services/DeepSeekProvider.test.ts",
+      "contentHash": "a6ee91d653475f19570561d864deefb99d00d361507f5bbcd9a48008a8289f8d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./DeepSeekProvider",
+          "specifiers": [
+            "DeepSeekProvider"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 73,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/DeepSeekProvider.ts": {
+      "filePath": "src/services/DeepSeekProvider.ts",
+      "contentHash": "2c6222ea1d546e7538041bb077394082009a1a5b47aed975271d3b3e0c5547c3",
+      "functions": [],
+      "classes": [
+        {
+          "name": "DeepSeekProvider",
+          "methods": [
+            "generate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 73
+        }
+      ],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result",
+            "AppError"
+          ]
+        },
+        {
+          "source": "@/services/providers",
+          "specifiers": [
+            "LLMProvider"
+          ]
+        },
+        {
+          "source": "@/services/parseResponse",
+          "specifiers": [
+            "parsePixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/services/constants",
+          "specifiers": [
+            "SYSTEM_PROMPT"
+          ]
+        }
+      ],
+      "exports": [
+        "DeepSeekProvider"
+      ],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/llmClient.test.ts": {
+      "filePath": "src/services/llmClient.test.ts",
+      "contentHash": "5043a31ea49dfc36e3565c88523ae99d6f4e4986a98074a29aa4ed7db5e4c1d8",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./llmClient",
+          "specifiers": [
+            "generate"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/llmClient.ts": {
+      "filePath": "src/services/llmClient.ts",
+      "contentHash": "d78450eb3735a5cd5c518bccb55992c2661cd53ed2b99365093cd91b27998c19",
+      "functions": [
+        {
+          "name": "getProviders",
+          "params": [],
+          "returnType": "Record<LLMProviderType, LLMProvider>",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "generate",
+          "params": [
+            "providerType",
+            "request"
+          ],
+          "returnType": "Promise<Result<PixelMapResponse>>",
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "LLMProviderType",
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result"
+          ]
+        },
+        {
+          "source": "@/services/AnthropicProvider",
+          "specifiers": [
+            "AnthropicProvider"
+          ]
+        },
+        {
+          "source": "@/services/OpenAIProvider",
+          "specifiers": [
+            "OpenAIProvider"
+          ]
+        },
+        {
+          "source": "@/services/OpenAICompatibleProvider",
+          "specifiers": [
+            "OpenAICompatibleProvider"
+          ]
+        },
+        {
+          "source": "@/services/DeepSeekProvider",
+          "specifiers": [
+            "DeepSeekProvider"
+          ]
+        },
+        {
+          "source": "@/services/providers",
+          "specifiers": [
+            "LLMProvider"
+          ]
+        }
+      ],
+      "exports": [
+        "generate"
+      ],
+      "totalLines": 35,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/OpenAICompatibleProvider.test.ts": {
+      "filePath": "src/services/OpenAICompatibleProvider.test.ts",
+      "contentHash": "82d2a286570d75944fc763e6c3c181c6b01896febda1b4b02bcd730f1b6ef2c9",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./OpenAICompatibleProvider",
+          "specifiers": [
+            "OpenAICompatibleProvider"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 73,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/OpenAICompatibleProvider.ts": {
+      "filePath": "src/services/OpenAICompatibleProvider.ts",
+      "contentHash": "3d77745f35a17a2988c3835adec5e04fdc228e05caf2b145fbb46caad2fb8054",
+      "functions": [],
+      "classes": [
+        {
+          "name": "OpenAICompatibleProvider",
+          "methods": [
+            "generate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 54
+        }
+      ],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result",
+            "AppError"
+          ]
+        },
+        {
+          "source": "@/services/providers",
+          "specifiers": [
+            "LLMProvider"
+          ]
+        },
+        {
+          "source": "@/services/parseResponse",
+          "specifiers": [
+            "parsePixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/services/constants",
+          "specifiers": [
+            "SYSTEM_PROMPT"
+          ]
+        }
+      ],
+      "exports": [
+        "OpenAICompatibleProvider"
+      ],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/OpenAIProvider.test.ts": {
+      "filePath": "src/services/OpenAIProvider.test.ts",
+      "contentHash": "01e350c860e417600151852e889efce1910f08bb494d63e3cb8516a967d4fa0f",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./OpenAIProvider",
+          "specifiers": [
+            "OpenAIProvider"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 113,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/OpenAIProvider.ts": {
+      "filePath": "src/services/OpenAIProvider.ts",
+      "contentHash": "0f9907828d2bd41073a00d5cd038a246d49715d7ae37524318449b20ee67bf09",
+      "functions": [],
+      "classes": [
+        {
+          "name": "OpenAIProvider",
+          "methods": [
+            "generate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 52
+        }
+      ],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result",
+            "AppError"
+          ]
+        },
+        {
+          "source": "@/services/providers",
+          "specifiers": [
+            "LLMProvider"
+          ]
+        },
+        {
+          "source": "@/services/parseResponse",
+          "specifiers": [
+            "parsePixelMapResponse"
+          ]
+        },
+        {
+          "source": "@/services/constants",
+          "specifiers": [
+            "SYSTEM_PROMPT"
+          ]
+        }
+      ],
+      "exports": [
+        "OpenAIProvider"
+      ],
+      "totalLines": 58,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/parseResponse.test.ts": {
+      "filePath": "src/services/parseResponse.test.ts",
+      "contentHash": "5126ea10e48cc9ed393cf861219124cb3df41342dfa4ce49e41a00798f11c859",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./parseResponse",
+          "specifiers": [
+            "parsePixelMapResponse"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/parseResponse.ts": {
+      "filePath": "src/services/parseResponse.ts",
+      "contentHash": "db43e5e54e14aa211b806c4d360bae72235084a15e34b6de02b0e2398541bf97",
+      "functions": [
+        {
+          "name": "parsePixelMapResponse",
+          "params": [
+            "raw"
+          ],
+          "returnType": "Result<PixelMapResponse>",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse",
+            "Result"
+          ]
+        }
+      ],
+      "exports": [
+        "parsePixelMapResponse"
+      ],
+      "totalLines": 33,
+      "hasStructuralAnalysis": true
+    },
+    "src/services/providers.ts": {
+      "filePath": "src/services/providers.ts",
+      "contentHash": "afa262c7f921c0e25f0fdd5cc5e36aff3d60a93cc1296d41de49419f701f080d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelGenRequest",
+            "PixelMapResponse",
+            "Result"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "src/test-setup.ts": {
+      "filePath": "src/test-setup.ts",
+      "contentHash": "27b9e0f69d156c680ff63560e58a12c01a4abec1bdb4756534c93e13c1f278ea",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@testing-library/jest-dom",
+          "specifiers": []
+        }
+      ],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "src/types/pixelmap.ts": {
+      "filePath": "src/types/pixelmap.ts",
+      "contentHash": "26df47bfcc158ff794d92163c217f350bb8d643a6d6a02348371c63e4d248498",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "PROVIDER_PRESETS"
+      ],
+      "totalLines": 65,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/buildAvatarHTML.test.ts": {
+      "filePath": "src/utils/buildAvatarHTML.test.ts",
+      "contentHash": "85d4348476ef6964c05ff5125cb0db3e43a9a2b9cae38e2e12e76510daacc5ca",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./buildAvatarHTML",
+          "specifiers": [
+            "buildAvatarHTML"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 131,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/buildAvatarHTML.ts": {
+      "filePath": "src/utils/buildAvatarHTML.ts",
+      "contentHash": "42597bc8c5255487201413dd9db5a29f8a0d44aa15165dd4ed272eacd4ed654f",
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "params": [
+            "s"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "isValidHex",
+          "params": [
+            "colour"
+          ],
+          "returnType": "boolean",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "buildAvatarHTML",
+          "params": [
+            "grid",
+            "label",
+            "prefix",
+            "username"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 65
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "buildAvatarHTML"
+      ],
+      "totalLines": 79,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/htmlExport.test.ts": {
+      "filePath": "src/utils/htmlExport.test.ts",
+      "contentHash": "1703ec8b7ddce97d8b421de09d40e2f9b284f1d29b335c15b8952ceccc6c57b1",
+      "functions": [
+        {
+          "name": "mockBrowserApis",
+          "params": [],
+          "exported": false,
+          "lineCount": 20
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./htmlExport",
+          "specifiers": [
+            "htmlExport"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 111,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/htmlExport.ts": {
+      "filePath": "src/utils/htmlExport.ts",
+      "contentHash": "24564aede4715fe8a80a33e2044cd8751b746900250dbc6fc38e44ae601d4e36",
+      "functions": [
+        {
+          "name": "htmlExport",
+          "params": [
+            "grid",
+            "label",
+            "prefix",
+            "username"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/utils/buildAvatarHTML",
+          "specifiers": [
+            "buildAvatarHTML"
+          ]
+        },
+        {
+          "source": "@/utils/sanitize",
+          "specifiers": [
+            "sanitize"
+          ]
+        }
+      ],
+      "exports": [
+        "htmlExport"
+      ],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/pngExport.test.ts": {
+      "filePath": "src/utils/pngExport.test.ts",
+      "contentHash": "3ed0284dfd405742796e05fb54521de69b4a1d6cad37ede9f851a0b68386366b",
+      "functions": [
+        {
+          "name": "mockBrowserApis",
+          "params": [],
+          "exported": false,
+          "lineCount": 27
+        },
+        {
+          "name": "tick",
+          "params": [],
+          "returnType": "Promise<void>",
+          "exported": false,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./pngExport",
+          "specifiers": [
+            "exportAsPng"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/pngExport.ts": {
+      "filePath": "src/utils/pngExport.ts",
+      "contentHash": "d6c382cebba72e003acea16bf443f05e2339d9178fb621647178d2abc7ce3295",
+      "functions": [
+        {
+          "name": "exportAsPng",
+          "params": [
+            "pixelMap",
+            "type",
+            "name"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 34
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@/types/pixelmap",
+          "specifiers": [
+            "PixelMapResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "exportAsPng"
+      ],
+      "totalLines": 37,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/sanitize.ts": {
+      "filePath": "src/utils/sanitize.ts",
+      "contentHash": "fe8f294c3e0c275ef50f6155a05f140145e94a099bbc969ca2fb72f2ec0096b9",
+      "functions": [
+        {
+          "name": "sanitize",
+          "params": [
+            "s"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "sanitize"
+      ],
+      "totalLines": 4,
+      "hasStructuralAnalysis": true
+    },
+    "src/vite-env.d.ts": {
+      "filePath": "src/vite-env.d.ts",
+      "contentHash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "vite.config.ts": {
+      "filePath": "vite.config.ts",
+      "contentHash": "20e1c19004a54c98df5a49ca54e8e65b6928f3168bfd0a6fa4b9e24e6f548539",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "vite-plugin-singlefile",
+          "specifiers": [
+            "viteSingleFile"
+          ]
+        },
+        {
+          "source": "path",
+          "specifiers": [
+            "resolve"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "vitest.config.ts": {
+      "filePath": "vitest.config.ts",
+      "contentHash": "53bf7eb441be294fdac23e675c425f2b2184b0869c1b215b8947c1ab8b0c8a72",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest/config",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "path",
+          "specifiers": [
+            "resolve"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

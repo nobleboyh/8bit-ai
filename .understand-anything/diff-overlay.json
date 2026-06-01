@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "baseBranch": "HEAD (uncommitted changes)",
+  "generatedAt": "2026-06-01T12:47:00.000Z",
+  "changedFiles": [
+    "src/types/pixelmap.ts",
+    "src/services/llmClient.ts",
+    "src/services/GeminiProvider.ts",
+    "src/services/GeminiProvider.test.ts",
+    "src/services/llmClient.test.ts",
+    "src/components/ProviderSelect/ProviderSelect.test.tsx"
+  ],
+  "changedNodeIds": [
+    "file:src/types/pixelmap.ts",
+    "file:src/services/llmClient.ts"
+  ],
+  "affectedNodeIds": [
+    "file:usePixelGeneration.ts",
+    "file:useProviderConfig.ts",
+    "file:ProviderSelect.tsx",
+    "file:usePixelGeneration.test.ts",
+    "file:AnthropicProvider.ts",
+    "file:src/services/OpenAIProvider.ts",
+    "file:src/services/OpenAICompatibleProvider.ts",
+    "file:src/services/DeepSeekProvider.ts",
+    "file:src/services/providers.ts",
+    "file:src/services/parseResponse.ts",
+    "file:src/services/constants.ts"
+  ]
+}
