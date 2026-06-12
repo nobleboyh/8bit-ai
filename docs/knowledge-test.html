@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelForge — Knowledge Assessment</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --surface-hover: #1c2a4a;
+      --fg: #e0e0e0;
+      --muted: #8892a4;
+      --accent: #64ffda;
+      --accent-dim: #45b8a0;
+      --danger: #ff6b6b;
+      --success: #51cf66;
+      --border: #2a2a4a;
+      --font-display: 'Courier New', monospace;
+      --font-body: system-ui, -apple-system, sans-serif;
+      --radius: 8px;
+    }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    a { color: var(--accent); text-decoration: underline; }
+
+    /* ── Layout ── */
+    .container { max-width: 880px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .hero .subtitle {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+    .hero p { color: var(--muted); margin-top: 0.6rem; font-size: 0.9rem; }
+
+    /* ── Group Selector ── */
+    .group-selector {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .group-selector h2 {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      letter-spacing: 2px;
+    }
+    .group-selector p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+    .group-btn-wrap { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .group-btn {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: 0.15s;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+    }
+    .group-btn:hover { border-color: var(--accent-dim); }
+    .group-btn.selected {
+      border-color: var(--accent);
+      background: rgba(100, 255, 218, 0.1);
+      color: var(--accent);
+    }
+
+    /* ── Graph Hint Banner ── */
+    .graph-hint {
+      display: none;
+      background: rgba(100, 255, 218, 0.06);
+      border: 1px dashed var(--accent-dim);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .graph-hint.show { display: block; }
+    .graph-hint strong { color: var(--accent); }
+    .graph-hint code {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      background: rgba(100, 255, 218, 0.08);
+      padding: 0.15em 0.35em;
+      border-radius: 3px;
+    }
+    .graph-hint .edge {
+      display: inline-block;
+      color: var(--accent-dim);
+      font-weight: 700;
+      margin: 0 0.2rem;
+    }
+
+    /* ── Meta bar ── */
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .meta-bar .score {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .meta-bar .score span { color: var(--fg); }
+    .meta-bar .timer {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .meta-bar .timer .clock { color: var(--accent-dim); }
+    .meta-bar .timer.running .clock { color: var(--accent); }
+    .btn-reset {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-reset:hover { color: var(--danger); border-color: var(--danger); }
+    .btn-submit-wrap { text-align: center; margin: 2rem 0 1.5rem; }
+
+    .btn-submit {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      padding: 0.75rem 2.5rem;
+      background: var(--accent);
+      color: #0a0a1a;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-submit:hover { background: var(--accent-dim); transform: scale(1.02); }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Sections ── */
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    /* ── Question Cards ── */
+    .question {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.25rem 1rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .question.correct { border-color: var(--success); }
+    .question.incorrect { border-color: var(--danger); }
+    .question.shown { border-color: var(--accent); }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .q-number {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .q-tag {
+      font-size: 0.55rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .tag-domain { background: #2d3748; color: #63b3ed; }
+    .tag-business { background: #2d3748; color: #fbbf24; }
+    .tag-architecture { background: #2d3748; color: var(--accent); }
+    .tag-relationship { background: #2d3748; color: #f472b6; }
+
+    .q-text {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+      line-height: 1.5;
+    }
+    .q-text code, .q-ctx code {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      background: rgba(100, 255, 218, 0.1);
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
+    .q-ctx {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      padding: 0.4rem 0.6rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 2px solid var(--border);
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+    .q-ctx strong { color: var(--accent-dim); }
+
+    /* ── Options ── */
+    .options { display: flex; flex-direction: column; gap: 0.35rem; }
+    .options label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      padding: 0.5rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.12s;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .options label:hover { background: var(--surface-hover); }
+    .options input[type="radio"] {
+      accent-color: var(--accent);
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .options .alpha {
+      font-weight: 700;
+      color: var(--accent-dim);
+      flex-shrink: 0;
+    }
+
+    /* ── Result banner ── */
+    .result-banner {
+      display: none;
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin: 1rem 0 2rem;
+      border: 2px solid;
+    }
+    .result-banner.show { display: block; }
+    .result-banner.pass { border-color: var(--success); background: rgba(81, 207, 102, 0.08); }
+    .result-banner.fail { border-color: var(--danger); background: rgba(255, 107, 107, 0.08); }
+    .result-banner h2 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+    .result-banner.pass h2 { color: var(--success); }
+    .result-banner.fail h2 { color: var(--danger); }
+    .result-banner p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+    .result-banner p strong { color: var(--fg); }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 0.7rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct { background: rgba(81, 207, 102, 0.1); color: var(--success); border-left: 3px solid var(--success); }
+    .feedback.incorrect { background: rgba(255, 107, 107, 0.1); color: var(--danger); border-left: 3px solid var(--danger); }
+    .feedback code {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      background: rgba(255,255,255,0.06);
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 500px) {
+      body { padding: 1rem 0.75rem; }
+      .hero h1 { font-size: 1.1rem; }
+      .q-text { font-size: 0.88rem; }
+      .group-btn { font-size: 0.6rem; padding: 0.5rem 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="hero">
+      <h1>PixelForge</h1>
+      <div class="subtitle">8-Bit Avatar Generator · Knowledge Assessment</div>
+      <p>Tests domain understanding, business context, code architecture, <strong style="color:#f472b6;">and — most importantly — your grasp of relationships between code elements.</strong><br>
+      15 questions · ~25 min</p>
+    </header>
+
+    <!-- ═══ GROUP SELECTOR ═══ -->
+    <div class="group-selector" id="groupSelector">
+      <h2>📊 Select Your Group</h2>
+      <p>This test measures whether studying the project's <strong>knowledge graph</strong> improves understanding.
+      Select your group before starting. This cannot be changed after submission.</p>
+      <div class="group-btn-wrap">
+        <button type="button" class="group-btn" data-group="control">🔍 No Graph<br><small style="color:var(--muted);font-size:0.6rem;">Study code files directly</small></button>
+        <button type="button" class="group-btn" data-group="graph">🧠 With Graph<br><small style="color:var(--muted);font-size:0.6rem;">Study <code>knowledge-graph.json</code></small></button>
+      </div>
+    </div>
+
+    <!-- ═══ GRAPH HINT BANNER (shown only to graph group) ═══ -->
+    <div class="graph-hint" id="graphHint">
+      <strong>🧠 Graph Hint Available</strong><br>
+      The project's knowledge graph at <code>.understand-anything/knowledge-graph.json</code>
+      captures <strong>nodes</strong> (files, types, classes, functions) and <strong>edges</strong>
+      (imports, tested_by, depends_on, implements, documents) with weights.
+      The questions marked <span class="q-tag tag-relationship">RELATIONSHIP</span> test connections
+      between code elements — the graph's edge data is especially useful for those.
+    </div>
+
+    <!-- ═══ META BAR ═══ -->
+    <div class="meta-bar">
+      <div class="score">Score: <span id="scoreDisplay">—</span></div>
+      <div class="timer" id="timerDisplay">
+        <span class="clock">⏱</span>
+        <span id="timerValue">00:00</span>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+        <span id="groupDisplay" style="font-size:0.75rem;color:var(--muted);"></span>
+        <button class="btn-reset" id="resetBtn">⟳ RESET</button>
+      </div>
+    </div>
+
+    <!-- ═══ QUIZ FORM ═══ -->
+    <form id="quizForm">
+
+      <!-- ─── DOMAIN ─── -->
+      <div class="section-label">🔹 Domain &amp; Functionality</div>
+
+      <!-- Q1 -->
+      <div class="question" data-q="1">
+        <div class="q-header">
+          <span class="q-number">Q1</span>
+          <span class="q-tag tag-domain">DOMAIN</span>
+        </div>
+        <div class="q-text">
+          What is the core purpose of PixelForge?
+        </div>
+        <div class="q-ctx"><strong>Hint:</strong> Think about what the user experience is end-to-end.</div>
+        <div class="options">
+          <label><input type="radio" name="q1" value="a"><span class="alpha">A.</span> A server-side API that converts photos into pixel art</label>
+          <label><input type="radio" name="q1" value="b"><span class="alpha">B.</span> A fully client-side React app that uses LLMs to generate 16×16 pixel avatars from text prompts</label>
+          <label><input type="radio" name="q1" value="c"><span class="alpha">C.</span> An online pixel-art editor with drawing tools</label>
+          <label><input type="radio" name="q1" value="d"><span class="alpha">D.</span> A game engine for rendering 8-bit sprites in real time</label>
+        </div>
+        <div class="feedback" data-for="1">
+          <strong>Correct!</strong> PixelForge is a client-only SPA. Users enter a text prompt → select an LLM provider → the LLM returns structured pixel data → it's rendered as a 16×16 grid in the browser.
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" data-q="2">
+        <div class="q-header">
+          <span class="q-number">Q2</span>
+          <span class="q-tag tag-domain">DOMAIN</span>
+        </div>
+        <div class="q-text">
+          How does the user's API key flow through the system?
+        </div>
+        <div class="options">
+          <label><input type="radio" name="q2" value="a"><span class="alpha">A.</span> Sent to a backend relay server for validation, then forwarded to the LLM provider</label>
+          <label><input type="radio" name="q2" value="b"><span class="alpha">B.</span> Encrypted and stored in a cookie with a 24-hour expiry</label>
+          <label><input type="radio" name="q2" value="c"><span class="alpha">C.</span> Stored in <code>sessionStorage</code> and sent directly to the chosen LLM provider's API — no backend relay</label>
+          <label><input type="radio" name="q2" value="d"><span class="alpha">D.</span> Discarded after each generation — the user must re-enter it every time</label>
+        </div>
+        <div class="feedback" data-for="2">
+          <strong>Correct!</strong> The <code>useApiKey</code> hook manages the key via <code>sessionStorage</code>, so it lives for the tab session but is gone when the tab closes. The app <em>never</em> sends it anywhere except directly to the provider's API — <strong>no backend proxy</strong>.
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question" data-q="3">
+        <div class="q-header">
+          <span class="q-number">Q3</span>
+          <span class="q-tag tag-domain">DOMAIN</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          The LLM response is parsed and validated before use. Which file validates the raw LLM output, and what type does it return?
+        </div>
+        <div class="q-ctx"><strong>Relationship chain:</strong> Every provider calls this parser. Its output feeds <code>AvatarGrid.tsx</code> for rendering.</div>
+        <div class="options">
+          <label><input type="radio" name="q3" value="a"><span class="alpha">A.</span> <code>llmClient.ts</code> — returns a raw <code>string</code></label>
+          <label><input type="radio" name="q3" value="b"><span class="alpha">B.</span> <code>parseResponse.ts</code> — returns <code>Result&lt;PixelMapResponse&gt;</code></label>
+          <label><input type="radio" name="q3" value="c"><span class="alpha">C.</span> <code>providers.ts</code> — returns <code>LLMProvider</code></label>
+          <label><input type="radio" name="q3" value="d"><span class="alpha">D.</span> <code>pixelmap.ts</code> — returns <code>PixelGenRequest</code></label>
+        </div>
+        <div class="feedback" data-for="3">
+          <strong>Correct!</strong> <code>parseResponse.ts</code> exports <code>parsePixelMapResponse()</code>, which is called by every provider implementation to validate the LLM's JSON output. It returns a <code>Result&lt;PixelMapResponse&gt;</code> — either <code>{ ok: true, data }</code> with validated palette/grid/label, or <code>{ ok: false, error }</code> with a <code>PARSE_ERROR</code> code.
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question" data-q="4">
+        <div class="q-header">
+          <span class="q-number">Q4</span>
+          <span class="q-tag tag-domain">DOMAIN</span>
+        </div>
+        <div class="q-text">
+          What export options are available after generating an avatar?
+        </div>
+        <div class="options">
+          <label><input type="radio" name="q4" value="a"><span class="alpha">A.</span> PNG only</label>
+          <label><input type="radio" name="q4" value="b"><span class="alpha">B.</span> PNG via <code>exportAsPng</code> and self-contained HTML via <code>htmlExport</code></label>
+          <label><input type="radio" name="q4" value="c"><span class="alpha">C.</span> PNG, JPEG, and SVG</label>
+          <label><input type="radio" name="q4" value="d"><span class="alpha">D.</span> GIF and CSV spreadsheet</label>
+        </div>
+        <div class="feedback" data-for="4">
+          <strong>Correct!</strong> Two export paths: PNG (via <code>OffscreenCanvas</code> → <code>convertToBlob</code>) and HTML (via <code>buildAvatarHTML</code> → self-contained document with inline styles, no external deps).
+        </div>
+      </div>
+
+
+      <!-- ─── RELATIONSHIPS (the core of the test) ─── -->
+      <div class="section-label">🔗 Code Relationships <span style="color:#f472b6;font-size:0.6rem;letter-spacing:1px;">(Key Section)</span></div>
+
+      <!-- Q5: App.tsx → hooks relationship -->
+      <div class="question" data-q="5">
+        <div class="q-header">
+          <span class="q-number">Q5</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          <code>App.tsx</code> composes several custom hooks. Which hooks manage (A) API key storage, (B) provider configuration, and (C) generation lifecycle?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> <code>App.tsx</code> has <code>imports</code> edges to its hooks. Each hook has a distinct storage mechanism.</div>
+        <div class="options">
+          <label><input type="radio" name="q5" value="a"><span class="alpha">A.</span> (A) <code>useTheme</code> (B) <code>useProviderConfig</code> (C) <code>useApiKey</code></label>
+          <label><input type="radio" name="q5" value="b"><span class="alpha">B.</span> (A) <code>useApiKey</code> (B) <code>useProviderConfig</code> (C) <code>usePixelGeneration</code></label>
+          <label><input type="radio" name="q5" value="c"><span class="alpha">C.</span> (A) <code>useApiKey</code> (B) <code>usePixelGeneration</code> (C) <code>useProviderConfig</code></label>
+          <label><input type="radio" name="q5" value="d"><span class="alpha">D.</span> (A) <code>useSessionStorage</code> (B) <code>useConfig</code> (C) <code>useGenerate</code></label>
+        </div>
+        <div class="feedback" data-for="5">
+          <strong>Correct!</strong> <code>App.tsx</code> wires up 4 hooks: <code>useTheme</code> (theme toggle), <code>useApiKey</code> (sessionStorage-backed key), <code>useProviderConfig</code> (localStorage-backed provider selection with override flags), and <code>usePixelGeneration</code> (generation state machine with concurrency guard). The graph's <code>imports</code> edges from <code>App.tsx</code> point to each hook file.
+        </div>
+      </div>
+
+      <!-- Q6: llmClient dispatching to providers -->
+      <div class="question" data-q="6">
+        <div class="q-header">
+          <span class="q-number">Q6</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          Trace the generation call chain starting from user input. Which file dispatches to the correct LLM provider, and what pattern prevents concurrent calls?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> Follow the <code>imports</code> edges: <code>ControlPanel</code> → fires callback → <code>App.tsx</code> calls hook → hook calls <code>llmClient.generate()</code> → dispatches by type.</div>
+        <div class="options">
+          <label><input type="radio" name="q6" value="a"><span class="alpha">A.</span> <code>App.tsx</code> directly instantiates providers; it uses a <code>setTimeout</code> queue</label>
+          <label><input type="radio" name="q6" value="b"><span class="alpha">B.</span> <code>llmClient.ts</code> dispatches via a <code>Record&lt;LLMProviderType, LLMProvider&gt;</code>; <code>usePixelGeneration</code> uses a <code>useRef</code> boolean guard</label>
+          <label><input type="radio" name="q6" value="c"><span class="alpha">C.</span> <code>providers.ts</code> has a switch statement; <code>useProviderConfig</code> prevents concurrent calls</label>
+          <label><input type="radio" name="q6" value="d"><span class="alpha">D.</span> <code>ControlPanel.tsx</code> calls the API directly; <code>ViewerShell</code> debounces the request</label>
+        </div>
+        <div class="feedback" data-for="6">
+          <strong>Correct!</strong> The chain is: <code>ControlPanel</code> → <code>App.tsx</code> → <code>usePixelGeneration.generate()</code> → <code>llmClient.generate(type, request)</code>. The <code>llmClient</code> looks up the provider in a lazy-initialised <code>Record</code>. Back in the hook, a <code>useRef</code> (<code>generatingRef</code>) prevents overlapping calls; it's cleared in a <code>finally</code> block.
+        </div>
+      </div>
+
+      <!-- Q7: ViewerShell state machine → sub-components -->
+      <div class="question" data-q="7">
+        <div class="q-header">
+          <span class="q-number">Q7</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          <code>ViewerShell</code> renders different child components depending on state. Match each state to its rendered component.
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> <code>ViewerShell.tsx</code> has <code>imports</code> edges to all 4 possible children. Its summary tag says "state machine."</div>
+        <div class="options">
+          <label><input type="radio" name="q7" value="a"><span class="alpha">A.</span> empty → <code>AvatarGrid</code>; loading → <code>LoadingIndicator</code>; error → <code>ErrorDisplay</code>; result → placeholder text</label>
+          <label><input type="radio" name="q7" value="b"><span class="alpha">B.</span> empty → placeholder icon; loading → <code>LoadingIndicator</code>; error → <code>ErrorDisplay</code>; result → <code>AvatarGrid</code> + download buttons</label>
+          <label><input type="radio" name="q7" value="c"><span class="alpha">C.</span> empty → blank div; loading → <code>AvatarGrid</code>; error → nothing; result → <code>LoadingIndicator</code></label>
+          <label><input type="radio" name="q7" value="d"><span class="alpha">D.</span> All states render <code>AvatarGrid</code> with different props</label>
+        </div>
+        <div class="feedback" data-for="7">
+          <strong>Correct!</strong> <code>ViewerShell</code> is a 4-state machine: <strong>empty</strong> (prompt placeholder), <strong>loading</strong> (<code>LoadingIndicator</code>), <strong>error</strong> (<code>ErrorDisplay</code>), and <strong>result</strong> (<code>AvatarGrid</code> + <code>DownloadButton</code> + <code>DownloadHtmlButton</code> + RE-FORGE). The graph's <code>imports</code> edges from <code>ViewerShell.tsx</code> point to all four sub-components.
+        </div>
+      </div>
+
+      <!-- Q8: Provider classes → LLMProvider interface -->
+      <div class="question" data-q="8">
+        <div class="q-header">
+          <span class="q-number">Q8</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          All provider classes implement a common interface. Where is that interface defined, and what method does it require?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> The graph has <code>implements</code> edges from each provider class to <code>interface:LLMProvider</code>. That interface node has <code>defined_in: src/services/providers.ts</code>.</div>
+        <div class="options">
+          <label><input type="radio" name="q8" value="a"><span class="alpha">A.</span> <code>pixelmap.ts</code> — requires <code>generate()</code> and <code>validate()</code></label>
+          <label><input type="radio" name="q8" value="b"><span class="alpha">B.</span> <code>constants.ts</code> — requires <code>generate()</code></label>
+          <label><input type="radio" name="q8" value="c"><span class="alpha">C.</span> <code>providers.ts</code> — requires <code>generate(request: PixelGenRequest): Promise&lt;Result&lt;PixelMapResponse&gt;&gt;</code></label>
+          <label><input type="radio" name="q8" value="d"><span class="alpha">D.</span> <code>llmClient.ts</code> — requires <code>fetch()</code> and <code>parse()</code></label>
+        </div>
+        <div class="feedback" data-for="8">
+          <strong>Correct!</strong> The <code>LLMProvider</code> interface lives in <code>src/services/providers.ts</code> (just 5 lines). It defines a single method: <code>generate(request: PixelGenRequest): Promise&lt;Result&lt;PixelMapResponse&gt;&gt;</code>. All 5 providers — <code>AnthropicProvider</code>, <code>OpenAIProvider</code>, <code>OpenAICompatibleProvider</code>, <code>DeepSeekProvider</code>, <code>GeminiProvider</code> — implement this contract.
+        </div>
+      </div>
+
+      <!-- Q9: DeepSeek provider uniqueness -->
+      <div class="question" data-q="9">
+        <div class="q-header">
+          <span class="q-number">Q9</span>
+          <span class="q-tag tag-architecture">ARCHITECTURE</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          How does <code>DeepSeekProvider</code> differ from the other providers that share the same API structure?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> The graph lists DeepSeekProvider's summary — look for "truncation" and "thinking." Compare with OpenAIProvider's summary.</div>
+        <div class="options">
+          <label><input type="radio" name="q9" value="a"><span class="alpha">A.</span> It uses a different HTTP method (PUT instead of POST)</label>
+          <label><input type="radio" name="q9" value="b"><span class="alpha">B.</span> It disables thinking (<code>thinking: { type: 'disabled' }</code>) and checks <code>finish_reason</code> for truncation</label>
+          <label><input type="radio" name="q9" value="c"><span class="alpha">C.</span> It authenticates via query parameter instead of header</label>
+          <label><input type="radio" name="q9" value="d"><span class="alpha">D.</span> It returns SVG instead of JSON</label>
+        </div>
+        <div class="feedback" data-for="9">
+          <strong>Correct!</strong> <code>DeepSeekProvider</code> uses the same <code>/v1/chat/completions</code> + <code>Bearer</code> auth as OpenAI, but adds two DeepSeek-specific features: it disables thinking mode and checks <code>finish_reason === 'length'</code> to detect truncated responses.
+        </div>
+      </div>
+
+      <!-- Q10: PixelMapResponse consumer chain -->
+      <div class="question" data-q="10">
+        <div class="q-header">
+          <span class="q-number">Q10</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          The <code>PixelMapResponse</code> type is consumed by multiple downstream consumers. Which of the following is <strong>NOT</strong> a direct consumer of <code>PixelMapResponse</code>?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> Follow the data flow: providers return it → hook stores it → <code>ViewerShell</code> passes it to children. Which child reads <code>palette</code>, <code>grid</code>, <code>label</code>?</div>
+        <div class="options">
+          <label><input type="radio" name="q10" value="a"><span class="alpha">A.</span> <code>AvatarGrid.tsx</code> — renders the grid cells and label</label>
+          <label><input type="radio" name="q10" value="b"><span class="alpha">B.</span> <code>DownloadButton.tsx</code> — passes it to <code>exportAsPng()</code></label>
+          <label><input type="radio" name="q10" value="c"><span class="alpha">C.</span> <code>buildAvatarHTML.ts</code> — generates self-contained HTML from grid data</label>
+          <label><input type="radio" name="q10" value="d"><span class="alpha">D.</span> <code>ProviderSelect.tsx</code> — maps providers to the grid output</label>
+        </div>
+        <div class="feedback" data-for="10">
+          <strong>Correct!</strong> <code>ProviderSelect.tsx</code> has nothing to do with <code>PixelMapResponse</code> — it renders the dropdown of provider choices, reading from <code>PROVIDER_PRESETS</code>. The actual consumers are <code>AvatarGrid</code> (rendering), <code>exportAsPng</code> (PNG export), <code>buildAvatarHTML</code> (HTML export), and <code>DownloadButton</code>/<code>DownloadHtmlButton</code> (triggers).
+        </div>
+      </div>
+
+      <!-- Q11: Utility function chain -->
+      <div class="question" data-q="11">
+        <div class="q-header">
+          <span class="q-number">Q11</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          <code>sanitize.ts</code> is a small utility. Which two export functions import and use <code>sanitize</code>?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> The graph's <code>imports</code> edges from utility files point to <code>sanitize.ts</code>. Follow them.</div>
+        <div class="options">
+          <label><input type="radio" name="q11" value="a"><span class="alpha">A.</span> <code>buildAvatarHTML</code> and <code>parsePixelMapResponse</code></label>
+          <label><input type="radio" name="q11" value="b"><span class="alpha">B.</span> <code>exportAsPng</code> and <code>htmlExport</code></label>
+          <label><input type="radio" name="q11" value="c"><span class="alpha">C.</span> <code>generate</code> (llmClient) and <code>AnthropicProvider.generate</code></label>
+          <label><input type="radio" name="q11" value="d"><span class="alpha">D.</span> <code>useProviderConfig</code> and <code>usePixelGeneration</code></label>
+        </div>
+        <div class="feedback" data-for="11">
+          <strong>Correct!</strong> Both <code>pngExport.ts</code> and <code>htmlExport.ts</code> import <code>sanitize</code> to produce safe filenames. <code>sanitize</code> lowercases, removes non-alphanumeric chars (except hyphens), and collapses multiple hyphens — preventing issues with special characters in downloaded file names.
+        </div>
+      </div>
+
+
+      <!-- ─── BUSINESS ─── -->
+      <div class="section-label">💼 Business &amp; Product Context</div>
+
+      <!-- Q12 -->
+      <div class="question" data-q="12">
+        <div class="q-header">
+          <span class="q-number">Q12</span>
+          <span class="q-tag tag-business">BUSINESS</span>
+        </div>
+        <div class="q-text">
+          What makes the build artifact (dist output) unique from a distribution standpoint?
+        </div>
+        <div class="options">
+          <label><input type="radio" name="q12" value="a"><span class="alpha">A.</span> It produces multiple files served from a Node.js server</label>
+          <label><input type="radio" name="q12" value="b"><span class="alpha">B.</span> It generates a Docker image for containerized deployment</label>
+          <label><input type="radio" name="q12" value="c"><span class="alpha">C.</span> It creates a single self-contained HTML file with all JS and CSS inlined — usable from any static server or <code>file://</code></label>
+          <label><input type="radio" name="q12" value="d"><span class="alpha">D.</span> It compiles to a native macOS/Windows executable via Electron</label>
+        </div>
+        <div class="feedback" data-for="12">
+          <strong>Correct!</strong> The <code>vite-plugin-singlefile</code> plugin inlines everything into one <code>dist/index.html</code>. Open it from a USB drive, any static server, or <code>file://</code> — zero deployment overhead. This is a key differentiator.
+        </div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="question" data-q="13">
+        <div class="q-header">
+          <span class="q-number">Q13</span>
+          <span class="q-tag tag-business">BUSINESS</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          The project has two epics (FEAT-001 and FEAT-002). What does FEAT-002 add that FEAT-001 did not include?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> The graph has <code>depends_on</code> edges from FEAT-002 stories back to FEAT-001 stories. FEAT-002 is a newer addition — what files are unique to it?</div>
+        <div class="options">
+          <label><input type="radio" name="q13" value="a"><span class="alpha">A.</span> Dark mode theme toggle and scanline overlay</label>
+          <label><input type="radio" name="q13" value="b"><span class="alpha">B.</span> Self-contained HTML export via <code>buildAvatarHTML</code> + <code>htmlExport</code> + <code>DownloadHtmlButton</code></label>
+          <label><input type="radio" name="q13" value="c"><span class="alpha">C.</span> ProviderSelect dropdown with keyboard navigation</label>
+          <label><input type="radio" name="q13" value="d"><span class="alpha">D.</span> Loading indicator animation</label>
+        </div>
+        <div class="feedback" data-for="13">
+          <strong>Correct!</strong> FEAT-001 built the core app: scaffolding, design system, API key input, providers, generation flow, PNG export. FEAT-002 added HTML export: the <code>buildAvatarHTML</code> pure function, <code>htmlExport</code> utility, and <code>DownloadHtmlButton</code> component. The graph shows FEAT-002 stories have <code>depends_on</code> edges to FEAT-001, confirming it's an incremental addition.
+        </div>
+      </div>
+
+
+      <!-- ─── ARCHITECTURE ─── -->
+      <div class="section-label">🏗️ Code Architecture</div>
+
+      <!-- Q14 -->
+      <div class="question" data-q="14">
+        <div class="q-header">
+          <span class="q-number">Q14</span>
+          <span class="q-tag tag-architecture">ARCHITECTURE</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          The <code>Result&lt;T, E&gt;</code> type is a discriminated union that appears throughout the codebase. Which of the following best describes how it flows through the system?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> The <code>Result</code> type node has edges from every function that returns it. Trace: provider → llmClient → hook → component.</div>
+        <div class="options">
+          <label><input type="radio" name="q14" value="a"><span class="alpha">A.</span> Defined in <code>pixelmap.ts</code> → returned by every <code>LLMProvider.generate()</code> → propagated through <code>llmClient.generate()</code> → unwrapped in <code>usePixelGeneration</code> which sets <code>pixelMap</code> or <code>error</code></label>
+          <label><input type="radio" name="q14" value="b"><span class="alpha">B.</span> Defined in <code>App.tsx</code> → passed as a prop to every child component</label>
+          <label><input type="radio" name="q14" value="c"><span class="alpha">C.</span> Defined in <code>providers.ts</code> → only used by <code>AnthropicProvider</code></label>
+          <label><input type="radio" name="q14" value="d"><span class="alpha">D.</span> Defined in <code>parseResponse.ts</code> → only used for LLM response parsing</label>
+        </div>
+        <div class="feedback" data-for="14">
+          <strong>Correct!</strong> <code>Result&lt;T, E&gt;</code> is defined in <code>pixelmap.ts</code> and used as the return type of the <code>LLMProvider</code> interface. Every provider returns <code>Result&lt;PixelMapResponse&gt;</code>, <code>llmClient.generate()</code> propagates it, and <code>usePixelGeneration</code> destructures it: <code>ok: true → setPixelMap(data)</code>, <code>ok: false → setError(error)</code>. The graph's <code>type</code> edges connect <code>Result</code> to every file that uses it.
+        </div>
+      </div>
+
+      <!-- Q15 -->
+      <div class="question" data-q="15">
+        <div class="q-header">
+          <span class="q-number">Q15</span>
+          <span class="q-tag tag-architecture">ARCHITECTURE</span>
+          <span class="q-tag tag-relationship">RELATIONSHIP</span>
+        </div>
+        <div class="q-text">
+          <code>useProviderConfig.ts</code> tracks "override" flags. Why is this necessary, and how do override flags relate to <code>PROVIDER_PRESETS</code>?
+        </div>
+        <div class="q-ctx"><strong>Graph clue:</strong> <code>useProviderConfig.ts</code> imports <code>PROVIDER_PRESETS</code> from <code>pixelmap.ts</code>. When a user switches providers, <code>overrideUrl</code> and <code>overrideModel</code> flags determine whether to overwrite with preset values.</div>
+        <div class="options">
+          <label><input type="radio" name="q15" value="a"><span class="alpha">A.</span> To prevent invalid URLs — the flags block submission of malformed inputs</label>
+          <label><input type="radio" name="q15" value="b"><span class="alpha">B.</span> To preserve custom URL/model edits when switching between providers — without them, a customised URL for provider A would be overwritten by provider B's preset defaults</label>
+          <label><input type="radio" name="q15" value="c"><span class="alpha">C.</span> To disable fields after the first generation, preventing mid-session config changes</label>
+          <label><input type="radio" name="q15" value="d"><span class="alpha">D.</span> To log which providers users customise for telemetry</label>
+        </div>
+        <div class="feedback" data-for="15">
+          <strong>Correct!</strong> When a user customises the API URL or model for one provider, then switches to another and switches back, the override flags (<code>overrideUrl</code>, <code>overrideModel</code>) ensure their custom values aren't silently replaced by the preset defaults. The hook auto-saves to localStorage and shows a "Settings saved locally" notice for 3 seconds. This is a UX detail that's easy to miss without understanding the relationship between provider presets and user config.
+        </div>
+      </div>
+
+      <!-- ═══ SUBMIT ═══ -->
+      <div class="btn-submit-wrap">
+        <button type="button" class="btn-submit" id="submitBtn" disabled>SELECT GROUP FIRST</button>
+      </div>
+
+    </form>
+
+    <!-- ═══ RESULT BANNER ═══ -->
+    <div class="result-banner" id="resultBanner">
+      <h2 id="resultTitle"></h2>
+      <p id="resultBody"></p>
+    </div>
+
+    <!-- ═══ SCORE BREAKDOWN ═══ -->
+    <div style="display:none;" id="breakdown">
+      <div class="section-label">📊 Score Breakdown</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:0.85rem;line-height:1.7;">
+        <div><strong style="color:#63b3ed;">Domain</strong> (Q1-4): <span id="bDomain">—</span></div>
+        <div><strong style="color:#f472b6;">Relationships</strong> (Q5-11, Q13-15): <span id="bRelationships">—</span></div>
+        <div><strong style="color:#fbbf24;">Business</strong> (Q12-13): <span id="bBusiness">—</span></div>
+        <div style="margin-top:0.3rem;"><strong>⏱ Time taken:</strong> <span id="bTime" style="color:var(--accent);font-family:var(--font-display);">—</span></div>
+        <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed var(--border);">
+          <strong>Relationship questions vs fact-retrieval questions:</strong><br>
+          <span style="color:#f472b6;">Relationship (graph-helpful)</span> — questions where the knowledge graph's <strong>edges</strong> (imports, depends_on, implements) directly help you trace connections between files.<br>
+          <span style="color:var(--muted);">Fact-retrieval (graph-less-helpful)</span> — questions answerable from any single file or general knowledge.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer style="text-align:center;margin-top:2rem;padding:1rem 0;border-top:1px solid var(--border);color:var(--muted);font-size:0.75rem;">
+      PixelForge Knowledge Assessment &mdash; Edit <code>docs/knowledge-test.html</code> to customise.
+    </footer>
+
+  </div>
+
+  <script>
+    (function() {
+      // ── Answer Key ──
+      // KEY[question] = correct letter
+      const KEY = {
+        q1: 'b', q2: 'c', q3: 'b', q4: 'b',
+        q5: 'b', q6: 'b', q7: 'b', q8: 'c', q9: 'b', q10: 'd', q11: 'b',
+        q12: 'c', q13: 'b',
+        q14: 'a', q15: 'b'
+      };
+
+      // ── Question categories ──
+      const CATEGORIES = {
+        domain:      ['q1','q2','q3','q4'],
+        relationship:['q5','q6','q7','q8','q9','q10','q11','q13','q14','q15'],
+        business:    ['q12','q13']
+      };
+
+      const TOTAL = Object.keys(KEY).length;
+
+      const form       = document.getElementById('quizForm');
+      const submitBtn  = document.getElementById('submitBtn');
+      const resetBtn   = document.getElementById('resetBtn');
+      const scoreEl    = document.getElementById('scoreDisplay');
+      const banner     = document.getElementById('resultBanner');
+      const titleEl    = document.getElementById('resultTitle');
+      const bodyEl     = document.getElementById('resultBody');
+      const graphHint  = document.getElementById('graphHint');
+      const groupDisplay = document.getElementById('groupDisplay');
+
+      // ── Timer state ──
+      let startTime = null;          // timestamp when timer started (ms)
+      let elapsedSeconds = 0;        // frozen elapsed on stop
+      let timerInterval = null;
+      const timerEl = document.getElementById('timerValue');
+      const timerWrap = document.getElementById('timerDisplay');
+      const bTimeEl = document.getElementById('bTime');
+      const breakdownDiv = document.getElementById('breakdown');
+
+      let selectedGroup = null;  // 'control' | 'graph'
+      let scored = false;
+
+      // ── Group selection ──
+      document.querySelectorAll('.group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (scored) return;
+          document.querySelectorAll('.group-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedGroup = btn.dataset.group;
+          groupDisplay.textContent = `Group: ${selectedGroup === 'graph' ? '🧠 With Graph' : '🔍 No Graph'}`;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'SUBMIT ALL';
+          // Show/hide graph hint
+          if (selectedGroup === 'graph') {
+            graphHint.classList.add('show');
+          } else {
+            graphHint.classList.remove('show');
+          }
+          document.getElementById('groupSelector').style.borderColor = selectedGroup === 'graph' ? '#f472b6' : 'var(--accent)';
+          if (!localStorage.getItem('pixelforge_timer_start_v2')) {
+            startTimer();
+          }
+          saveState();
+        });
+      });
+
+      // ── Timer helpers ──
+      function formatTime(sec) {
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(Math.floor(sec % 60)).padStart(2, '0');
+        return `${m}:${s}`;
+      }
+
+      function startTimer() {
+        stopTimer(); // clear any previous interval
+        // If we have a saved start time, resume from there; otherwise set now
+        const saved = localStorage.getItem('pixelforge_timer_start_v2');
+        if (saved) {
+          startTime = parseInt(saved, 10);
+        } else {
+          startTime = Date.now();
+          localStorage.setItem('pixelforge_timer_start_v2', String(startTime));
+        }
+        timerInterval = setInterval(() => {
+          elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+          timerEl.textContent = formatTime(elapsedSeconds);
+        }, 200);
+        timerWrap.classList.add('running');
+      }
+
+      function stopTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        timerWrap.classList.remove('running');
+        // Final freeze
+        if (startTime) {
+          elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+          timerEl.textContent = formatTime(elapsedSeconds);
+        }
+      }
+
+      // ── Load saved state ──
+      function loadState() {
+        const saved = localStorage.getItem('pixelforge_knowledge_test_v2');
+        if (!saved) return;
+        try {
+          const state = JSON.parse(saved);
+          // Restore group
+          if (state.group) {
+            const btn = document.querySelector(`.group-btn[data-group="${state.group}"]`);
+            if (btn) btn.click();
+          }
+          // Restore answers
+          for (const [name, value] of Object.entries(state.answers)) {
+            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+            if (radio) radio.checked = true;
+          }
+          if (state.submitted) {
+            // Restore elapsed time from saved state
+            if (state.elapsedSeconds) {
+              elapsedSeconds = state.elapsedSeconds;
+              timerEl.textContent = formatTime(elapsedSeconds);
+            }
+            scoreTest(true);
+          } else if (state.group) {
+            // Restore running timer
+            startTimer();
+          }
+        } catch (_) {}
+      }
+
+      // ── Save state ──
+      function saveState() {
+        if (scored) return;
+        const formData = new FormData(form);
+        const answers = {};
+        for (const [name, value] of formData.entries()) {
+          answers[name] = value;
+        }
+        localStorage.setItem('pixelforge_knowledge_test_v2', JSON.stringify({
+          answers,
+          group: selectedGroup,
+          submitted: false
+        }));
+      }
+
+      // ── Score test ──
+      function scoreTest(silent) {
+        if (!silent && !selectedGroup) {
+          alert('Please select your group (With Graph or No Graph) before submitting.');
+          return;
+        }
+
+        const formData = new FormData(form);
+        let correct = 0;
+        const byCategory = { domain: [0,0], relationship: [0,0], business: [0,0] };
+
+        // Clear previous markings
+        document.querySelectorAll('.question').forEach(q => {
+          q.classList.remove('correct', 'incorrect', 'shown');
+        });
+        document.querySelectorAll('.feedback').forEach(f => {
+          f.classList.remove('show', 'correct', 'incorrect');
+        });
+
+        for (const [name, value] of formData.entries()) {
+          if (!KEY[name]) continue;
+          const qNum = name.replace('q','');
+          const questionEl = document.querySelector(`.question[data-q="${qNum}"]`);
+          const feedbackEl = document.querySelector(`.feedback[data-for="${qNum}"]`);
+          const isCorrect = value === KEY[name];
+
+          // Track by category
+          for (const [cat, questions] of Object.entries(CATEGORIES)) {
+            if (questions.includes(name)) {
+              byCategory[cat][0]++;
+              if (isCorrect) byCategory[cat][1]++;
+            }
+          }
+
+          if (isCorrect) {
+            correct++;
+            if (questionEl) questionEl.classList.add('correct');
+            if (feedbackEl) feedbackEl.classList.add('show', 'correct');
+          } else {
+            if (questionEl) questionEl.classList.add('incorrect');
+            if (feedbackEl) {
+              feedbackEl.classList.add('show', 'incorrect');
+              const correctLetter = KEY[name].toUpperCase();
+              const correctText = feedbackEl.innerHTML;
+              feedbackEl.innerHTML = `<strong>Not quite.</strong> The correct answer was <strong>${correctLetter}</strong>. ${correctText.replace(/^<strong>.*?<\/strong>\s*/, '')}`;
+            }
+          }
+        }
+
+        const pct = Math.round((correct / TOTAL) * 100);
+        scoreEl.textContent = `${correct}/${TOTAL} (${pct}%)`;
+
+        // Update breakdown
+        document.getElementById('bDomain').textContent = `${byCategory.domain[1]}/${byCategory.domain[0]}`;
+        document.getElementById('bRelationships').textContent = `${byCategory.relationship[1]}/${byCategory.relationship[0]}`;
+        document.getElementById('bBusiness').textContent = `${byCategory.business[1]}/${byCategory.business[0]}`;
+        bTimeEl.textContent = formatTime(elapsedSeconds);
+
+        // Relationship-specific sub-score
+        const relCorrect = byCategory.relationship[1];
+        const relTotal   = byCategory.relationship[0];
+        const relPct     = relTotal > 0 ? Math.round((relCorrect / relTotal) * 100) : 0;
+
+        if (!silent) {
+          breakdownDiv.style.display = 'block';
+          banner.classList.add('show');
+
+          let groupNote = '';
+          if (selectedGroup === 'graph') {
+            groupNote = `You used the <strong>knowledge graph</strong>.`;
+          } else {
+            groupNote = `You studied the <strong>source code directly</strong>.`;
+          }
+
+          if (pct >= 70) {
+            banner.classList.remove('fail');
+            banner.classList.add('pass');
+            titleEl.textContent = '🎉 Great job!';
+            bodyEl.innerHTML = `
+              You scored <strong>${correct}/${TOTAL}</strong> (${pct}%) &mdash; <strong>⏱ ${formatTime(elapsedSeconds)}</strong>. ${groupNote}<br>
+              <strong style="color:#f472b6;">Relationship questions:</strong> ${relCorrect}/${relTotal} (${relPct}%) &mdash;
+              ${relPct >= 70 ? 'Strong understanding of how code elements connect.' : 'Room to improve tracing connections between files.'}
+              ${selectedGroup === 'graph' && relPct < 70 ? '<br>Try studying the <strong>edges</strong> section of the knowledge graph more carefully.' : ''}
+              ${selectedGroup === 'control' && relPct < 70 ? '<br>The knowledge graph at <code>.understand-anything/knowledge-graph.json</code> captures all these relationships explicitly.' : ''}
+            `;
+          } else {
+            banner.classList.remove('pass');
+            banner.classList.add('fail');
+            titleEl.textContent = '📖 Room to grow';
+            bodyEl.innerHTML = `
+              You scored <strong>${correct}/${TOTAL}</strong> (${pct}%) &mdash; <strong>⏱ ${formatTime(elapsedSeconds)}</strong>. ${groupNote}<br>
+              <strong style="color:#f472b6;">Relationship questions:</strong> ${relCorrect}/${relTotal} (${relPct}%) &mdash;
+              Focus on understanding how files <strong>connect</strong> through imports, data flow, and the component tree.
+              ${selectedGroup === 'graph' ? '<br>Tip: Look at the <strong>edges</strong> array in the knowledge graph &mdash; each edge shows source → target → type (imports, tested_by, depends_on).' : ''}
+              ${selectedGroup === 'control' ? '<br>Tip: The knowledge graph at <code>.understand-anything/knowledge-graph.json</code> captures all relationships with <strong>edges</strong> — imports, tested_by, depends_on, and more.' : ''}
+            `;
+          }
+
+          banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        scored = true;
+        stopTimer();
+        const answers = {};
+        for (const [name, value] of formData.entries()) {
+          answers[name] = value;
+        }
+        localStorage.setItem('pixelforge_knowledge_test_v2', JSON.stringify({
+          answers,
+          group: selectedGroup,
+          submitted: true,
+          elapsedSeconds
+        }));
+        submitBtn.disabled = true;
+        submitBtn.textContent = '✓ SUBMITTED';
+      }
+
+      // ── Reset ──
+      function resetTest() {
+        form.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+        document.querySelectorAll('.question').forEach(q => {
+          q.classList.remove('correct', 'incorrect', 'shown');
+        });
+        document.querySelectorAll('.feedback').forEach(f => {
+          f.classList.remove('show', 'correct', 'incorrect');
+        });
+        banner.classList.remove('show', 'pass', 'fail');
+        breakdownDiv.style.display = 'none';
+        scoreEl.textContent = '—';
+        scored = false;
+        // Don't reset group selection
+        if (selectedGroup) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'SUBMIT ALL';
+        }
+        localStorage.removeItem('pixelforge_knowledge_test_v2');
+        localStorage.removeItem('pixelforge_timer_start_v2');
+        stopTimer();
+        startTime = null;
+        elapsedSeconds = 0;
+        timerEl.textContent = '00:00';
+        bTimeEl.textContent = '—';
+        // Re-save group context
+        if (selectedGroup) {
+          const answers = {};
+          localStorage.setItem('pixelforge_knowledge_test_v2', JSON.stringify({
+            answers, group: selectedGroup, submitted: false
+          }));
+        }
+      }
+
+      // ── Event listeners ──
+      form.addEventListener('change', () => {
+        if (!scored) saveState();
+      });
+
+      submitBtn.addEventListener('click', () => {
+        if (!selectedGroup) {
+          alert('Please select your group first (With Graph or No Graph).');
+          return;
+        }
+        const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+        if (answered === 0) {
+          alert('Please answer at least one question before submitting.');
+          return;
+        }
+        document.querySelectorAll('.question').forEach(q => {
+          const qNum = q.dataset.q;
+          const answered_ = form.querySelector(`input[name="q${qNum}"]:checked`);
+          if (!answered_) q.classList.add('shown');
+        });
+        scoreTest(false);
+      });
+
+      resetBtn.addEventListener('click', () => {
+        if (scored && !confirm('Reset all answers and clear your score?')) return;
+        resetTest();
+      });
+
+      // ── Init ──
+      loadState();
+    })();
+  </script>
+</body>
+</html>
