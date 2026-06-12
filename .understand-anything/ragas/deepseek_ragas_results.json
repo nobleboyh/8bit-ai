@@ -1,0 +1,47 @@
+{
+  "total_usage": {
+    "prompt_tokens": 23429,
+    "completion_tokens": 9190,
+    "total_tokens": 32619
+  },
+  "results": [
+    {
+      "id": "complex-add-groq-provider__with_source",
+      "user_input": "Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults. Walk through every file needing change and describe exact modifications.",
+      "reference": "1. pixelmap.ts: Add 'groq' to LLMProviderType union. Add Groq preset to PROVIDER_PRESETS: apiUrl 'https://api.groq.com/openai', model 'llama-3.3-70b-versatile'.\n2. Create src/services/GroqProvider.ts following OpenAIProvider pattern.\n3. llmClient.ts: Import GroqProvider, add 'groq' dispatch case.\n4. ProviderSelect.tsx: No change if presets drive options; otherwise add Groq.\n5. Add GroqProvider.test.ts following existing test patterns.",
+      "response_preview": "## 1. `src/types/pixelmap.ts`\n\n- Add `'groq'` to the `LLMProviderType` union:\n```ts\nexport type LLMProviderType = 'anthropic' | 'openai' | 'openai-compatible' | 'deepseek' | 'groq'\n```\n\n- Add a new preset in `PROVIDER_PRESETS`:\n```ts\n{\n  type: 'groq',\n  label: 'Groq',\n  apiUrl: 'https://api.groq.com/openai/v1',\n  model: 'llama3-70b-8192',\n},\n```\n\n## 2. New file: `src/services/GroqProvider.ts`\n\nCreate a class that implements the same HTTP logic as `OpenAIProvider` (Groq uses the same `/v1/chat/co",
+      "context_count": 1,
+      "context_type": "with_source",
+      "category": "hard",
+      "scores": {
+        "faithfulness": 0.0,
+        "context_precision": 0.9999999999,
+        "context_recall": 0.0
+      },
+      "passed": false,
+      "failures": [
+        "faithfulness: 0.000 < 0.700",
+        "context_recall: 0.000 < 0.500"
+      ]
+    },
+    {
+      "id": "complex-add-groq-provider__with_kg",
+      "user_input": "Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults. Walk through every file needing change and describe exact modifications.",
+      "reference": "1. pixelmap.ts: Add 'groq' to LLMProviderType union. Add Groq preset to PROVIDER_PRESETS: apiUrl 'https://api.groq.com/openai', model 'llama-3.3-70b-versatile'.\n2. Create src/services/GroqProvider.ts following OpenAIProvider pattern.\n3. llmClient.ts: Import GroqProvider, add 'groq' dispatch case.\n4. ProviderSelect.tsx: No change if presets drive options; otherwise add Groq.\n5. Add GroqProvider.test.ts following existing test patterns.",
+      "response_preview": "- **`src/types/pixelmap.ts`**  \n  - Add `'groq'` to the `LLMProviderType` union.  \n  - Add a new entry to `PROVIDER_PRESETS`:\n    ```ts\n    {\n      type: 'groq',\n      label: 'Groq',\n      apiUrl: 'https://api.groq.com/openai/v1',\n      model: 'llama3-70b-8192',\n    }\n    ```\n\n- **`src/services/llmClient.ts`**  \n  - In `getProviders()`, add `'groq': new OpenAICompatibleProvider()` to the `providers` object (the import for `OpenAICompatibleProvider` already exists).\n\nNo other files require change",
+      "context_count": 1,
+      "context_type": "with_kg",
+      "category": "hard",
+      "scores": {
+        "faithfulness": 0.0,
+        "context_precision": 0.9999999999,
+        "context_recall": 0.0
+      },
+      "passed": false,
+      "failures": [
+        "faithfulness: 0.000 < 0.700",
+        "context_recall: 0.000 < 0.500"
+      ]
+    }
+  ]
+}

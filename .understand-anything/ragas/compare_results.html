@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelForge KG Evaluation — with_source vs with_kg</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #f78166;
+    --kg: #7c5cfc;
+    --no-kg: #8b949e;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+  h1 .sub { font-size: 1rem; font-weight: 400; color: var(--text-dim); }
+  .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 24px; }
+  h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 14px; margin-top: 32px; display: flex; align-items: center; gap: 8px; }
+  h2:first-of-type { margin-top: 0; }
+  h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 16px; margin-bottom: 20px; font-size: 0.8rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .legend-dot.kg { background: var(--kg); }
+  .legend-dot.no { background: var(--no-kg); }
+  .legend-dot.green { background: var(--green); }
+  .legend-dot.red { background: var(--red); }
+  .legend-dot.yellow { background: var(--yellow); }
+  .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 140px;
+  }
+  .stat-card .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .stat-card .stat-row { display: flex; align-items: baseline; gap: 12px; }
+  .stat-card .stat-row .pair { display: flex; flex-direction: column; }
+  .stat-card .value { font-size: 1.5rem; font-weight: 700; }
+  .stat-card .value .label-inline { font-size: 0.65rem; font-weight: 400; color: var(--text-dim); margin-left: 4px; }
+  .value.green { color: var(--green); }
+  .value.yellow { color: var(--yellow); }
+  .value.red { color: var(--red); }
+  .value.kg-color { color: var(--kg); }
+  .value.no-color { color: var(--no-kg); }
+  .explain-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--kg);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .explain-box strong { color: var(--kg); }
+  .explain-box .no-strong { color: var(--no-kg); }
+  .comparison-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .comparison-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .comparison-grid { grid-template-columns: 1fr; } }
+  .metric-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    overflow-x: auto;
+  }
+  .metric-table-wrap h3 {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; font-size: 0.85rem;
+  }
+  .metric-table-wrap h3 .desc { font-size: 0.7rem; font-weight: 400; color: var(--text-dim); }
+  .metric-table-wrap h3 .col-headers { display: flex; gap: 8px; font-size: 0.7rem; color: var(--text-dim); }
+  .col-kg { color: var(--kg); font-weight: 600; }
+  .col-no { color: var(--no-kg); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.4px; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td.task-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.score-cell { white-space: nowrap; text-align: right; }
+  .bar-bg { display: inline-block; width: 50px; height: 10px; background: var(--surface2); border-radius: 3px; vertical-align: middle; margin-right: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; min-width: 2px; }
+  .bar-fill.kg-bar { background: var(--kg); }
+  .bar-fill.no-bar { background: var(--no-kg); }
+  .score-green { color: var(--green); font-weight: 600; }
+  .score-yellow { color: var(--yellow); font-weight: 600; }
+  .score-red { color: var(--red); font-weight: 600; }
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .task-header:hover { background: rgba(255,255,255,0.02); }
+  .task-header .toggle {
+    color: var(--text-dim); font-size: 0.75rem; width: 18px; text-align: center;
+    flex-shrink: 0;
+  }
+  .task-header .cat {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .task-header .q { flex: 1; font-size: 0.82rem; }
+  .task-header .mini-scores { display: flex; gap: 10px; font-size: 0.7rem; flex-shrink: 0; }
+  .task-header .mini-scores .ms { text-align: center; min-width: 50px; }
+  .task-header .mini-scores .ms .mv { font-weight: 600; }
+  .task-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+  .task-body.open { display: block; }
+  .score-summary {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 12px 0; font-size: 0.78rem;
+  }
+  .score-summary .ss-item { display: flex; flex-direction: column; gap: 2px; }
+  .score-summary .ss-item .ss-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; }
+  .score-summary .ss-item .ss-row { display: flex; gap: 10px; align-items: center; }
+  .score-summary .ss-item .ss-row .kg-val { color: var(--kg); font-weight: 600; }
+  .score-summary .ss-item .ss-row .no-val { color: var(--no-kg); font-weight: 600; }
+  .score-summary .ss-item .ss-row .arrow { color: var(--text-dim); margin: 0 4px; }
+  .score-summary .ss-item .ss-row .delta.positive { color: var(--green); }
+  .score-summary .ss-item .ss-row .delta.negative { color: var(--red); }
+  .score-summary .ss-item .ss-row .delta.neutral { color: var(--text-dim); }
+  .response-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  @media (max-width: 700px) { .response-compare { grid-template-columns: 1fr; } }
+  .resp-box {
+    background: #0d1117;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.74rem;
+    max-height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace;
+    line-height: 1.45;
+  }
+  .resp-box .label {
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif;
+    font-weight: 600;
+  }
+  .resp-box.kg { border-left: 3px solid var(--kg); }
+  .resp-box.kg .label { color: var(--kg); }
+  .resp-box.source { border-left: 3px solid var(--no-kg); }
+  .resp-box.source .label { color: var(--no-kg); }
+  .ref-box {
+    background: #0d1b2a;
+    border: 1px solid #1a3a2a;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.74rem;
+    margin-top: 12px;
+    white-space: pre-wrap;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace;
+    line-height: 1.45;
+  }
+  .ref-box .label {
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--green);
+    margin-bottom: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif;
+    font-weight: 600;
+  }
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 0.72rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); }
+  .filter-btn.active { background: var(--kg); border-color: var(--kg); color: #fff; }
+  .filter-btn.active.all { background: var(--accent); border-color: var(--accent); }
+  [data-tip] { position: relative; cursor: help; border-bottom: 1px dashed var(--text-dim); }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2e;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--text);
+    font-weight: 400;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+  @media (max-width: 600px) { [data-tip]:hover::after { white-space: normal; max-width: 260px; } }
+  .tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: var(--surface2); color: var(--text-dim); font-size: 0.6rem; font-weight: 700; cursor: help; margin-left: 4px; vertical-align: middle; line-height: 14px; }
+  .token-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; }
+  .token-section h3 { margin-bottom: 12px; font-size: 0.85rem; }
+  .token-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+  .token-item { display: flex; flex-direction: column; gap: 2px; }
+  .token-item .tl { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.4px; }
+  .token-item .tv { font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .token-item .tv.kg-color { color: var(--kg); }
+  .token-item .tv.no-color { color: var(--no-kg); }
+  .token-item .tv.total { color: var(--accent); }
+  .token-item .tv-sub { font-size: 0.65rem; color: var(--text-dim); margin-top: 1px; }
+  .token-per-case { font-size: 0.72rem; margin-top: 4px; padding: 6px 0; }
+  .token-per-case .tpc-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .token-per-case .tpc-row .tpc-item { display: flex; align-items: center; gap: 4px; }
+  .token-per-case .tpc-row .tpc-item .tpc-val { font-weight: 600; }
+  .token-per-case .tpc-row .tpc-item .tpc-val.kg-color { color: var(--kg); }
+  .token-per-case .tpc-row .tpc-item .tpc-val.no-color { color: var(--no-kg); }
+  .task-tokens { font-size: 0.68rem; color: var(--text-dim); display: flex; gap: 10px; padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 8px; }
+  .task-tokens .tt-item { display: flex; align-items: center; gap: 3px; }
+  .task-tokens .tt-item .tt-l { color: var(--text-dim); }
+  .task-tokens .tt-item .tt-v { font-weight: 600; }
+  .task-tokens .tt-item .tt-v.kg-c { color: var(--kg); }
+  .task-tokens .tt-item .tt-v.no-c { color: var(--no-kg); }
+  .mt-8 { margin-top: 8px; }
+  .mb-8 { margin-bottom: 8px; }
+  .text-dim { color: var(--text-dim); }
+  .text-sm { font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<h1>PixelForge <span class="sub">— KG-Aided Evaluation</span></h1>
+<div class="subtitle">
+  Comparing DeepSeek answer quality <strong style="color:var(--kg)">with KG</strong> vs <strong style="color:var(--no-kg)">source-only</strong>
+  context on 1 PixelForge coding tasks
+</div>
+<div class="legend">
+<span class="legend-item"><span class="legend-dot kg"></span> With KG — source + knowledge-graph structural metadata</span>
+<span class="legend-item"><span class="legend-dot no"></span> Source Only — source files without KG metadata</span>
+<span class="legend-item"><span class="legend-dot green"></span> Passed (score ≥ threshold)</span>
+<span class="legend-item"><span class="legend-dot red"></span> Failed (score &lt; threshold)</span>
+</div>
+<div class="stats-row">
+  <div class="stat-card"><div class="label">Total Cases</div><div class="value">2</div></div>
+  <div class="stat-card"><div class="label">Passed</div><div class="value green">0 <span class="label-inline">/2</span></div></div>
+  <div class="stat-card"><div class="label">Failed</div><div class="value red">2 <span class="label-inline">/2</span></div></div>
+</div>
+<div class="explain-box">
+The RAGAS metrics measure different aspects of LLM response quality: 
+<strong>Faithfulness</strong> checks whether the response is factually supported by the provided context. 
+<strong>Context Precision</strong> measures whether relevant context chunks appear higher in the ranking. 
+<strong>Context Recall</strong> measures whether all relevant context chunks were retrieved. 
+Each metric is scored from 0 to 1. 
+<strong style='color:var(--kg)'>KG-aided</strong> responses include source code + knowledge-graph structural metadata, 
+while <strong class="no-strong">source-only</strong> responses include source files without KG metadata.
+</div>
+<h2>Metric Averages</h2>
+<div class="stats-row">
+  <div class="stat-card"><div class="label">Faithfulness</div><div class="value red">0.0%</div></div>
+  <div class="stat-card"><div class="label">Context Precision</div><div class="value green">100.0%</div></div>
+  <div class="stat-card"><div class="label">Context Recall</div><div class="value red">0.0%</div></div>
+</div>
+<h2>Per-Metric Comparison</h2>
+<div class="comparison-grid">
+<div class="metric-table-wrap">
+<h3><span>Faithfulness</span> <span class="desc">threshold 0.70</span></h3>
+<table><tr><th>Task</th><th class="col-kg">With KG</th><th class="col-no">Source Only</th></tr>
+<tr><td class="task-name" title="Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults.">add-groq-provider</td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill kg-bar" style="width:0%"></span></span><span class="score-red">0.000</span></td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill no-bar" style="width:0%"></span></span><span class="score-red">0.000</span></td>
+</tr>
+</table></div>
+<div class="metric-table-wrap">
+<h3><span>Context Precision</span> <span class="desc">threshold 0.50</span></h3>
+<table><tr><th>Task</th><th class="col-kg">With KG</th><th class="col-no">Source Only</th></tr>
+<tr><td class="task-name" title="Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults.">add-groq-provider</td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill kg-bar" style="width:100%"></span></span><span class="score-green">1.000</span></td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill no-bar" style="width:100%"></span></span><span class="score-green">1.000</span></td>
+</tr>
+</table></div>
+<div class="metric-table-wrap">
+<h3><span>Context Recall</span> <span class="desc">threshold 0.50</span></h3>
+<table><tr><th>Task</th><th class="col-kg">With KG</th><th class="col-no">Source Only</th></tr>
+<tr><td class="task-name" title="Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults.">add-groq-provider</td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill kg-bar" style="width:0%"></span></span><span class="score-red">0.000</span></td>
+<td class="score-cell"><span class="bar-bg"><span class="bar-fill no-bar" style="width:0%"></span></span><span class="score-red">0.000</span></td>
+</tr>
+</table></div>
+</div>
+<h2>Context Type Comparison</h2>
+<table><tr><th>Metric</th><th class="col-no">Source Only</th><th class="col-kg">With KG</th><th>Delta</th></tr>
+<tr><td><strong>Faithfulness</strong></td><td class='no-val'>0.000</td><td class='kg-val'>0.000</td><td><span class="delta neutral">+0.000</span></td></tr>
+<tr><td><strong>Context Precision</strong></td><td class='no-val'>1.000</td><td class='kg-val'>1.000</td><td><span class="delta neutral">+0.000</span></td></tr>
+<tr><td><strong>Context Recall</strong></td><td class='no-val'>0.000</td><td class='kg-val'>0.000</td><td><span class="delta neutral">+0.000</span></td></tr>
+</table>
+<h2>Category Breakdown</h2>
+<table><tr><th>Category</th><th>Total</th><th>Passed</th><th>Failed</th>
+<th>Faithfulness avg</th>
+<th>Context Precision avg</th>
+<th>Context Recall avg</th>
+</tr>
+<tr><td><strong>hard</strong></td><td>2</td><td style='color:var(--green)'>0</td><td style='color:var(--red)'>2</td>
+<td>0.000</td>
+<td>1.000</td>
+<td>0.000</td>
+</tr>
+</table>
+<h2>Token Usage</h2>
+<div class="token-section">
+<h3>Evaluation (RAGAS scoring)</h3>
+<div class="token-grid">
+  <div class="token-item"><span class="tv total">23,429</span><span class="tl">prompt_tokens</span></div>
+  <div class="token-item"><span class="tv total">9,190</span><span class="tl">completion_tokens</span></div>
+  <div class="token-item"><span class="tv total">32,619</span><span class="tl">total_tokens</span></div>
+</div>
+<div class="token-per-case">
+<h3>Task generation (DeepSeek calls)</h3>
+<div class="tpc-row">
+<span class="tpc-item"><span class="tpc-val kg-color">2,638</span> avg/task with KG</span>
+<span class="tpc-item"><span class="tpc-val no-color">3,548</span> avg/task source-only</span>
+</div></div>
+</div>
+<h2>Task Details</h2>
+<div class="filter-bar">
+<button class="filter-btn active all" data-filter="all">All</button>
+<button class="filter-btn" data-filter="hard">hard</button>
+<button class="filter-btn" data-filter="pass">Passed</button>
+<button class="filter-btn" data-filter="fail">Failed</button>
+</div>
+<div class="task-card" data-category="hard" data-passed="false">
+<div class="task-header" onclick="toggleTask(this)">
+<span class="toggle">▶</span>
+<span class="cat">hard</span>
+<span class="q">Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults.</span>
+<span class="mini-scores">
+<span class="ms"><span class="mv score-red">0.000</span><br><span class="text-dim text-sm">faithfulness</span></span>
+<span class="ms"><span class="mv score-green">1.000</span><br><span class="text-dim text-sm">precision</span></span>
+<span class="ms"><span class="mv score-red">0.000</span><br><span class="text-dim text-sm">recall</span></span>
+</span></div>
+<div class="task-body">
+<div class="score-summary">
+<div class="ss-item">
+<span class="ss-label">Faithfulness</span>
+<span class="ss-row"><span class="score-red" style="font-size:1.1em;font-weight:700">0.000</span></span>
+</div>
+<div class="ss-item">
+<span class="ss-label">Context Precision</span>
+<span class="ss-row"><span class="score-green" style="font-size:1.1em;font-weight:700">1.000</span></span>
+</div>
+<div class="ss-item">
+<span class="ss-label">Context Recall</span>
+<span class="ss-row"><span class="score-red" style="font-size:1.1em;font-weight:700">0.000</span></span>
+</div>
+</div>
+<div class="task-tokens">
+<span class="tt-item"><span class="tt-l">prompt tokens</span> <span class="tt-v">1,946</span></span>
+<span class="tt-item"><span class="tt-l">completion tokens</span> <span class="tt-v">692</span></span>
+<span class="tt-item"><span class="tt-l">total tokens</span> <span class="tt-v">2,638</span></span>
+</div>
+<div class="response-compare">
+<div class="resp-box source"><span class="label">Source Only</span>## 1. `src/types/pixelmap.ts`
+
+- Add `'groq'` to the `LLMProviderType` union:
+```ts
+export type LLMProviderType = 'anthropic' | 'openai' | 'openai-compatible' | 'deepseek' | 'groq'
+```
+
+- Add a new preset in `PROVIDER_PRESETS`:
+```ts
+{
+  type: 'groq',
+  label: 'Groq',
+  apiUrl: 'https://api.groq.com/openai/v1',
+  model: 'llama3-70b-8192',
+},
+```
+
+## 2. New file: `src/services/GroqProvider.ts`
+
+Create a class that implements the same HTTP logic as `OpenAIProvider` (Groq uses the same `/v1/chat/completions` endpoint structure).
+
+```ts
+import type { PixelGenRequest, PixelMapResponse, Result, AppError } from '@/types/pixelmap'
+import type { LLMProvider } from '@/services/providers'
+import { parsePixelMapResponse } from '@/services/parseResponse'
+import { SYSTEM_PROMPT } from '@/services/constants'
+
+export class GroqProvider implements LLMProvider {
+  async generate(request: PixelGenRequest): Promise&lt;Result&lt;PixelMapResponse&gt;&gt; {
+    try {
+      const response = await fetch(`${request.apiUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${request.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: request.model,
+          max_tokens: 8192,
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: request.prompt },
+          ],
+        }),
+      })
+
+      if (!response.ok) {
+        const statusText = await response.text().catch(() =&gt; response.statusText)
+        return {
+          ok: false,
+          error: {
+            message: `API ${response.status}: ${statusText}`,
+            code: 'API_ERROR',
+            status: response.status,
+          } satisfies AppError,
+        }
+      }
+
+      const data = await response.json()
+      const content = data.choices?.[0]?.message?.content
+      if (!content) {
+        return {
+          ok: false,
+          error: { message: 'Empty response from Groq API'</div>
+<div class="resp-box kg"><span class="label">With KG</span>- **`src/types/pixelmap.ts`**  
+  - Add `'groq'` to the `LLMProviderType` union.  
+  - Add a new entry to `PROVIDER_PRESETS`:
+    ```ts
+    {
+      type: 'groq',
+      label: 'Groq',
+      apiUrl: 'https://api.groq.com/openai/v1',
+      model: 'llama3-70b-8192',
+    }
+    ```
+
+- **`src/services/llmClient.ts`**  
+  - In `getProviders()`, add `'groq': new OpenAICompatibleProvider()` to the `providers` object (the import for `OpenAICompatibleProvider` already exists).
+
+No other files require changes. The `ProviderSelect` component and all routing logic automatically support the new type via the updated constants.</div>
+</div>
+<div class="ref-box"><span class="label">Reference Answer</span>1. pixelmap.ts: Add 'groq' to LLMProviderType union. Add Groq preset to PROVIDER_PRESETS: apiUrl 'https://api.groq.com/openai', model 'llama-3.3-70b-versatile'.
+2. Create src/services/GroqProvider.ts following OpenAIProvider pattern.
+3. llmClient.ts: Import GroqProvider, add 'groq' dispatch case.
+4. ProviderSelect.tsx: No change if presets drive options; otherwise add Groq.
+5. Add GroqProvider.test.ts following existing test patterns.</div>
+</div></div>
+<div class="task-card" data-category="hard" data-passed="false">
+<div class="task-header" onclick="toggleTask(this)">
+<span class="toggle">▶</span>
+<span class="cat">hard</span>
+<span class="q">Add a new Groq LLM provider to PixelForge. Groq uses OpenAI-compatible /v1/chat/completions but with different defaults.</span>
+<span class="mini-scores">
+<span class="ms"><span class="mv score-red">0.000</span><br><span class="text-dim text-sm">faithfulness</span></span>
+<span class="ms"><span class="mv score-green">1.000</span><br><span class="text-dim text-sm">precision</span></span>
+<span class="ms"><span class="mv score-red">0.000</span><br><span class="text-dim text-sm">recall</span></span>
+</span></div>
+<div class="task-body">
+<div class="score-summary">
+<div class="ss-item">
+<span class="ss-label">Faithfulness</span>
+<span class="ss-row"><span class="score-red" style="font-size:1.1em;font-weight:700">0.000</span></span>
+</div>
+<div class="ss-item">
+<span class="ss-label">Context Precision</span>
+<span class="ss-row"><span class="score-green" style="font-size:1.1em;font-weight:700">1.000</span></span>
+</div>
+<div class="ss-item">
+<span class="ss-label">Context Recall</span>
+<span class="ss-row"><span class="score-red" style="font-size:1.1em;font-weight:700">0.000</span></span>
+</div>
+</div>
+<div class="task-tokens">
+<span class="tt-item"><span class="tt-l">prompt tokens</span> <span class="tt-v">1,933</span></span>
+<span class="tt-item"><span class="tt-l">completion tokens</span> <span class="tt-v">1,615</span></span>
+<span class="tt-item"><span class="tt-l">total tokens</span> <span class="tt-v">3,548</span></span>
+</div>
+<div class="response-compare">
+<div class="resp-box kg"><span class="label">With KG</span>- **`src/types/pixelmap.ts`**  
+  - Add `'groq'` to the `LLMProviderType` union.  
+  - Add a new entry to `PROVIDER_PRESETS`:
+    ```ts
+    {
+      type: 'groq',
+      label: 'Groq',
+      apiUrl: 'https://api.groq.com/openai/v1',
+      model: 'llama3-70b-8192',
+    }
+    ```
+
+- **`src/services/llmClient.ts`**  
+  - In `getProviders()`, add `'groq': new OpenAICompatibleProvider()` to the `providers` object (the import for `OpenAICompatibleProvider` already exists).
+
+No other files require changes. The `ProviderSelect` component and all routing logic automatically support the new type via the updated constants.</div>
+<div class="resp-box source"><span class="label">Source Only</span>## 1. `src/types/pixelmap.ts`
+
+- Add `'groq'` to the `LLMProviderType` union:
+```ts
+export type LLMProviderType = 'anthropic' | 'openai' | 'openai-compatible' | 'deepseek' | 'groq'
+```
+
+- Add a new preset in `PROVIDER_PRESETS`:
+```ts
+{
+  type: 'groq',
+  label: 'Groq',
+  apiUrl: 'https://api.groq.com/openai/v1',
+  model: 'llama3-70b-8192',
+},
+```
+
+## 2. New file: `src/services/GroqProvider.ts`
+
+Create a class that implements the same HTTP logic as `OpenAIProvider` (Groq uses the same `/v1/chat/completions` endpoint structure).
+
+```ts
+import type { PixelGenRequest, PixelMapResponse, Result, AppError } from '@/types/pixelmap'
+import type { LLMProvider } from '@/services/providers'
+import { parsePixelMapResponse } from '@/services/parseResponse'
+import { SYSTEM_PROMPT } from '@/services/constants'
+
+export class GroqProvider implements LLMProvider {
+  async generate(request: PixelGenRequest): Promise&lt;Result&lt;PixelMapResponse&gt;&gt; {
+    try {
+      const response = await fetch(`${request.apiUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${request.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: request.model,
+          max_tokens: 8192,
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: request.prompt },
+          ],
+        }),
+      })
+
+      if (!response.ok) {
+        const statusText = await response.text().catch(() =&gt; response.statusText)
+        return {
+          ok: false,
+          error: {
+            message: `API ${response.status}: ${statusText}`,
+            code: 'API_ERROR',
+            status: response.status,
+          } satisfies AppError,
+        }
+      }
+
+      const data = await response.json()
+      const content = data.choices?.[0]?.message?.content
+      if (!content) {
+        return {
+          ok: false,
+          error: { message: 'Empty response from Groq API'</div>
+</div>
+<div class="ref-box"><span class="label">Reference Answer</span>1. pixelmap.ts: Add 'groq' to LLMProviderType union. Add Groq preset to PROVIDER_PRESETS: apiUrl 'https://api.groq.com/openai', model 'llama-3.3-70b-versatile'.
+2. Create src/services/GroqProvider.ts following OpenAIProvider pattern.
+3. llmClient.ts: Import GroqProvider, add 'groq' dispatch case.
+4. ProviderSelect.tsx: No change if presets drive options; otherwise add Groq.
+5. Add GroqProvider.test.ts following existing test patterns.</div>
+</div></div>
+<script>
+
+function toggleTask(header) {
+  var body = header.nextElementSibling;
+  var toggle = header.querySelector('.toggle');
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    toggle.textContent = '\u25b6';
+  } else {
+    body.classList.add('open');
+    toggle.textContent = '\u25bc';
+  }
+}
+
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var filter = this.getAttribute('data-filter');
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelectorAll('.task-card').forEach(function(card) {
+      if (filter === 'all') {
+        card.style.display = '';
+      } else if (filter === 'pass') {
+        card.style.display = card.getAttribute('data-passed') === 'true' ? '' : 'none';
+      } else if (filter === 'fail') {
+        card.style.display = card.getAttribute('data-passed') === 'false' ? '' : 'none';
+      } else {
+        card.style.display = card.getAttribute('data-category') === filter ? '' : 'none';
+      }
+    });
+  });
+});
+
+</script>
+</body></html>
