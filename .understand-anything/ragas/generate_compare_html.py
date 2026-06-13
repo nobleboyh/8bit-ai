@@ -33,24 +33,11 @@ def fmt_pct(score: float | None) -> str:
     return f"{score * 100:.1f}%"
 
 
-def score_color(score: float | None, threshold: float) -> str:
-    if score is None:
-        return "yellow"
-    return "green" if score >= threshold else "red"
-
-
 def bar_width(score: float | None) -> str:
     if score is None:
         return "0"
     return f"{min(score, 1.0) * 100:.0f}"
 
-
-METRIC_THRESHOLDS = {
-    "faithfulness": 0.70,
-    "context_precision": 0.50,
-    "context_recall": 0.50,
-    "answer_relevancy": 0.70,
-}
 
 METRIC_LABELS = {
     "faithfulness": "Faithfulness",
@@ -58,6 +45,23 @@ METRIC_LABELS = {
     "context_recall": "Context Recall",
     "answer_relevancy": "Answer Relevancy",
 }
+
+METRIC_THRESHOLDS = {
+    "faithfulness": 0.7,
+    "context_precision": 0.7,
+    "context_recall": 0.6,
+    "answer_relevancy": 0.7,
+}
+
+
+def score_color(score: float | None, threshold: float) -> str:
+    if score is None:
+        return "red"
+    if score >= threshold:
+        return "green"
+    if score >= threshold * 0.6:
+        return "yellow"
+    return "red"
 
 
 def load_data(tasks_path: Path, scores_path: Path) -> tuple[dict, dict, list[dict]]:
@@ -77,20 +81,16 @@ def load_data(tasks_path: Path, scores_path: Path) -> tuple[dict, dict, list[dic
 def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -> str:
     usage = scores_data.get("total_usage", {})
     total = len(results)
-    passed = sum(1 for r in results if r["passed"])
-    failed = total - passed
 
-    metric_names = [k for k in METRIC_THRESHOLDS if k != "answer_relevancy"]
+    # All metrics that have scores
+    metric_names = []
+    for r in results:
+        for k, v in r["scores"].items():
+            if v is not None and k not in metric_names:
+                metric_names.append(k)
 
-    has_answer_relevancy = any(
-        r["scores"].get("answer_relevancy") is not None
-        for r in results
-    )
-    if has_answer_relevancy and "answer_relevancy" not in metric_names:
-        metric_names.append("answer_relevancy")
-
-    def avg_score(name: str) -> float | None:
-        vals = [r["scores"].get(name) for r in results if r["scores"].get(name) is not None]
+    def avg_score(name: str, items: list[dict]) -> float | None:
+        vals = [r["scores"].get(name) for r in items if r["scores"].get(name) is not None]
         return sum(vals) / len(vals) if vals else None
 
     by_ctx: dict[str, list[dict]] = {}
@@ -155,6 +155,17 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
   .legend-dot.green { background: var(--green); }
   .legend-dot.red { background: var(--red); }
   .legend-dot.yellow { background: var(--yellow); }
+  .ctx-badge {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .ctx-badge.kg { background: var(--kg); color: #fff; }
+  .ctx-badge.source { background: var(--no-kg); color: #fff; }
   .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
   .stat-card {
     background: var(--surface);
@@ -407,8 +418,6 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
     # Stats
     w('<div class="stats-row">')
     w('  <div class="stat-card"><div class="label">Total Cases</div><div class="value">%d</div></div>' % total)
-    w('  <div class="stat-card"><div class="label">Passed</div><div class="value green">%d <span class="label-inline">/%d</span></div></div>' % (passed, total))
-    w('  <div class="stat-card"><div class="label">Failed</div><div class="value red">%d <span class="label-inline">/%d</span></div></div>' % (failed, total))
     w("</div>")
 
     # Explanation
@@ -426,9 +435,8 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
     w("<h2>Metric Averages</h2>")
     w('<div class="stats-row">')
     for m in metric_names:
-        avg = avg_score(m)
-        c = score_color(avg, METRIC_THRESHOLDS.get(m, 0.5))
-        w('  <div class="stat-card"><div class="label">%s</div><div class="value %s">%s</div></div>' % (METRIC_LABELS.get(m, m), c, fmt_pct(avg)))
+        avg = avg_score(m, results)
+        w('  <div class="stat-card"><div class="label">%s</div><div class="value">%s</div></div>' % (METRIC_LABELS.get(m, m), fmt_pct(avg)))
     w("</div>")
 
     # Per-metric comparison tables
@@ -445,17 +453,15 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
         )
 
         w('<div class="metric-table-wrap">')
-        w('<h3><span>%s</span> <span class="desc">threshold %.2f</span></h3>' % (METRIC_LABELS.get(m, m), METRIC_THRESHOLDS.get(m, 0.5)))
+        w('<h3><span>%s</span></h3>' % METRIC_LABELS.get(m, m))
         w('<table><tr><th>Task</th><th class="col-kg">With KG</th><th class="col-no">Source Only</th></tr>')
 
         for (wr, wsc), (or_, osc) in zip(kg_list, source_list):
-            wc = score_color(wsc, METRIC_THRESHOLDS.get(m, 0.5))
-            oc = score_color(osc, METRIC_THRESHOLDS.get(m, 0.5))
             # task name
             tn = wr["id"].replace("__with_kg", "").replace("__with_source", "").replace("basic-", "").replace("intermediate-", "").replace("complex-", "").replace("advanced-", "").replace("very_hard-", "").replace("hard-", "")
             w('<tr><td class="task-name" title="%s">%s</td>' % (esc(wr["user_input"][:120]), esc(tn)))
-            w('<td class="score-cell"><span class="bar-bg"><span class="bar-fill kg-bar" style="width:%s%%"></span></span><span class="score-%s">%s</span></td>' % (bar_width(wsc), wc, fmt(wsc)))
-            w('<td class="score-cell"><span class="bar-bg"><span class="bar-fill no-bar" style="width:%s%%"></span></span><span class="score-%s">%s</span></td>' % (bar_width(osc), oc, fmt(osc)))
+            w('<td class="score-cell"><span class="bar-bg"><span class="bar-fill kg-bar" style="width:%s%%"></span></span><span>%s</span></td>' % (bar_width(wsc), fmt(wsc)))
+            w('<td class="score-cell"><span class="bar-bg"><span class="bar-fill no-bar" style="width:%s%%"></span></span><span>%s</span></td>' % (bar_width(osc), fmt(osc)))
             w("</tr>")
         w("</table></div>")
     w("</div>")
@@ -485,14 +491,12 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
     # Category breakdown
     w("<h2>Category Breakdown</h2>")
     if by_cat:
-        w("<table><tr><th>Category</th><th>Total</th><th>Passed</th><th>Failed</th>")
+        w("<table><tr><th>Category</th><th>Total</th>")
         for m in metric_names:
             w("<th>%s avg</th>" % METRIC_LABELS.get(m, m))
         w("</tr>")
         for cat, items in sorted(by_cat.items()):
-            _pass = sum(1 for r in items if r["passed"])
-            f_ = len(items) - _pass
-            w("<tr><td><strong>%s</strong></td><td>%d</td><td style='color:var(--green)'>%d</td><td style='color:var(--red)'>%d</td>" % (esc(cat), len(items), _pass, f_))
+            w("<tr><td><strong>%s</strong></td><td>%d</td>" % (esc(cat), len(items)))
             for m in metric_names:
                 vals = [r["scores"].get(m) for r in items if r["scores"].get(m) is not None]
                 avg = sum(vals) / len(vals) if vals else None
@@ -536,9 +540,7 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
     w('<button class="filter-btn active all" data-filter="all">All</button>')
     for cat in cats:
         w('<button class="filter-btn" data-filter="%s">%s</button>' % (esc(cat), esc(cat)))
-    w('<button class="filter-btn" data-filter="pass">Passed</button>')
-    w('<button class="filter-btn" data-filter="fail">Failed</button>')
-    w("</div>")
+    w('</div>')
 
     tasks_by_id = {}
     for case in tasks_data.get("cases", []):
@@ -549,9 +551,12 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
         task = tasks_by_id.get(tid, {})
 
         scores = r["scores"]
-        w('<div class="task-card" data-category="%s" data-passed="%s">' % (esc(r.get("category", "")), str(r["passed"]).lower()))
+        current_ctx = "with_kg" if "_with_kg" in tid else "with_source"
+        ctx_badge = '<span class="ctx-badge kg">With KG</span>' if current_ctx == "with_kg" else '<span class="ctx-badge source">Source Only</span>'
+        w('<div class="task-card" data-category="%s" data-ctx="%s">' % (esc(r.get("category", "")), current_ctx))
         w('<div class="task-header" onclick="toggleTask(this)">')
         w('<span class="toggle">\u25b6</span>')
+        w('%s' % ctx_badge)
         w('<span class="cat">%s</span>' % esc(r.get("category", "")))
         w('<span class="q">%s</span>' % esc(r["user_input"][:120]))
         w('<span class="mini-scores">')
@@ -567,11 +572,9 @@ def build_html(tasks_data: dict, scores_data: dict, results: list[dict], args) -
         w('<div class="score-summary">')
         for m in metric_names:
             sc = scores.get(m)
-            c = score_color(sc, METRIC_THRESHOLDS.get(m, 0.5))
-            t = METRIC_THRESHOLDS.get(m, 0.5)
             w('<div class="ss-item">')
             w('<span class="ss-label">%s</span>' % METRIC_LABELS.get(m, m))
-            w('<span class="ss-row"><span class="score-%s" style="font-size:1.1em;font-weight:700">%s</span></span>' % (c, fmt(sc)))
+            w('<span class="ss-row"><span style="font-size:1.1em;font-weight:700">%s</span></span>' % fmt(sc))
             w('</div>')
         w("</div>")
 
@@ -631,10 +634,6 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
     document.querySelectorAll('.task-card').forEach(function(card) {
       if (filter === 'all') {
         card.style.display = '';
-      } else if (filter === 'pass') {
-        card.style.display = card.getAttribute('data-passed') === 'true' ? '' : 'none';
-      } else if (filter === 'fail') {
-        card.style.display = card.getAttribute('data-passed') === 'false' ? '' : 'none';
       } else {
         card.style.display = card.getAttribute('data-category') === filter ? '' : 'none';
       }

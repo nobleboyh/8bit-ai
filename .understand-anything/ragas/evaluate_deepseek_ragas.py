@@ -8,7 +8,7 @@ OpenAI-compatible endpoint.
 
 Usage:
   export DEEPSEEK_API_KEY=...
-  python3.12 evaluate_deepseek_ragas.py --input deepseek_tasks_output.json
+  python3.12 evaluate_deepseek_ragas.py --input .understand-anything/ragas/deepseek_tasks_output.json
 
 Optional answer relevancy:
   export DEEPSEEK_EMBED_MODEL=<embedding-model-id>
@@ -135,14 +135,6 @@ RAGAS_SYSTEM_PROMPT = (
     "You are a strict RAGAS metric scorer. Return only the structured JSON object "
     "requested by the response schema. Do not include analysis, markdown, or prose."
 )
-DEFAULT_THRESHOLDS = {
-    "faithfulness": 0.70,
-    "context_precision": 0.50,
-    "context_recall": 0.50,
-    "answer_relevancy": 0.70,
-}
-
-
 def _as_list(value) -> list[str]:
     if value is None:
         return []
@@ -251,19 +243,6 @@ def _metric_value(result):
     return value
 
 
-def evaluate_failures(scores: dict, thresholds: dict) -> list[str]:
-    failures = []
-    for metric_name, min_score in thresholds.items():
-        if metric_name not in scores:
-            continue
-        score = scores[metric_name]
-        if score is None:
-            failures.append(f"{metric_name}: unavailable")
-        elif isinstance(score, (int, float)) and score < min_score:
-            failures.append(f"{metric_name}: {score:.3f} < {min_score:.3f}")
-    return failures
-
-
 async def score_case(case: dict, metrics: list, timeout: float | None) -> dict:
     scores = {}
     for metric in metrics:
@@ -320,8 +299,9 @@ async def score_case(case: dict, metrics: list, timeout: float | None) -> dict:
 async def run(
     input_path: Path,
     output_path: Path,
+    report_path: Path | None,
     timeout: float | None,
-    thresholds: dict,
+    _thresholds: dict,
     token: str | None = None,
 ) -> None:
     cases, file_token = load_cases(input_path)
@@ -345,7 +325,6 @@ async def run(
     results = []
     for case in cases:
         scores = await score_case(case, metrics, timeout)
-        failures = evaluate_failures(scores, thresholds)
         results.append(
             {
                 "id": case["id"],
@@ -356,8 +335,6 @@ async def run(
                 "context_type": case.get("context_type", "unknown"),
                 "category": case.get("category", "unknown"),
                 "scores": scores,
-                "passed": not failures,
-                "failures": failures,
             }
         )
 
@@ -371,10 +348,33 @@ async def run(
     print(f"Results saved to {output_path}")
     print(f"Total token usage: {total_usage}")
 
-    failed = [result for result in results if not result["passed"]]
-    print(f"Passed: {len(results) - len(failed)}/{len(results)}")
-    for result in failed:
-        print(f"  FAIL {result['id']}: {', '.join(result['failures'])}")
+    # Metric averages by context type
+    by_ctx: dict[str, list[dict]] = {}
+    for r in results:
+        by_ctx.setdefault(r.get("context_type", "unknown"), []).append(r)
+
+    metric_names = [k for k in results[0]["scores"] if results[0]["scores"][k] is not None]
+    print("\nMetric averages:")
+    for ctx, items in sorted(by_ctx.items()):
+        print(f"  {ctx}:")
+        for m in metric_names:
+            vals = [r["scores"].get(m) for r in items if r["scores"].get(m) is not None]
+            if vals:
+                avg = sum(vals) / len(vals)
+                print(f"    {m}: {avg:.3f}")
+
+    # Generate HTML report
+    if report_path:
+        try:
+            from generate_compare_html import load_data as gc_load_data, build_html
+
+            tasks_data, scores_data, html_results = gc_load_data(input_path, output_path)
+            html = build_html(tasks_data, scores_data, html_results, None)
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            report_path.write_text(html, encoding="utf-8")
+            print(f"HTML report saved to {report_path}")
+        except Exception as e:
+            print(f"  [WARN] HTML report generation failed: {e}", file=sys.stderr)
 
 
 def main() -> None:
@@ -398,21 +398,23 @@ def main() -> None:
         default=None,
         help="DeepSeek API token. Falls back to DEEPSEEK_API_KEY env var or token in input JSON.",
     )
-    parser.add_argument("--min-faithfulness", type=float, default=DEFAULT_THRESHOLDS["faithfulness"])
-    parser.add_argument("--min-context-precision", type=float, default=DEFAULT_THRESHOLDS["context_precision"])
-    parser.add_argument("--min-context-recall", type=float, default=DEFAULT_THRESHOLDS["context_recall"])
-    parser.add_argument("--min-answer-relevancy", type=float, default=DEFAULT_THRESHOLDS["answer_relevancy"])
+    parser.add_argument(
+        "--report",
+        default=None,
+        help="Path for HTML report (default: same path as --output with .html extension). "
+        "Pass --report '' to skip HTML generation.",
+    )
     args = parser.parse_args()
-    thresholds = {
-        "faithfulness": args.min_faithfulness,
-        "context_precision": args.min_context_precision,
-        "context_recall": args.min_context_recall,
-        "answer_relevancy": args.min_answer_relevancy,
-    }
     if not args.input:
         parser.error("--input is required")
     output_path = Path(args.output)
-    asyncio.run(run(Path(args.input), output_path, args.timeout, thresholds, token=args.token))
+    if args.report is None:
+        report_path = output_path.with_suffix(".html")
+    elif args.report == "":
+        report_path = None
+    else:
+        report_path = Path(args.report)
+    asyncio.run(run(Path(args.input), output_path, report_path, args.timeout, {}, token=args.token))
 
 
 if __name__ == "__main__":

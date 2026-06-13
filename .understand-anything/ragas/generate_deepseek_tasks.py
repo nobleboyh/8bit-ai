@@ -596,9 +596,8 @@ TASKS = [
             "src/components/ProviderSelect/ProviderSelect.tsx",
         ],
         "type_ids": [
-            "file:const:PROVIDER_PRESETS",
-            "file:type:LLMProviderType",
-            "class:OpenAIProvider",
+            "function:src/services/llmClient.ts:generate",
+            "class:src/services/OpenAIProvider.ts:OpenAIProvider",
         ],
         "reference": (
             "1. pixelmap.ts: Add 'groq' to LLMProviderType union. "
@@ -625,8 +624,8 @@ TASKS = [
             "src/App.tsx",
         ],
         "type_ids": [
-            "function:usePixelGeneration.ts:usePixelGeneration",
-            "function:ViewerShell.tsx:ViewerShell",
+            "function:src/hooks/usePixelGeneration.ts:usePixelGeneration",
+            "function:src/components/ViewerShell/ViewerShell.tsx:ViewerShell",
         ],
         "reference": (
             "New type: GenerationRecord { id, pixelMap, prompt, type, timestamp } in pixelmap.ts.\n"
@@ -652,8 +651,7 @@ TASKS = [
             "src/types/pixelmap.ts",
         ],
         "type_ids": [
-            "function:usePixelGeneration.ts:usePixelGeneration",
-            "file:type:PixelGenRequest",
+            "function:src/hooks/usePixelGeneration.ts:usePixelGeneration",
         ],
         "reference": (
             "Create useResponseCache hook: caches PixelMapResponse keyed by "
