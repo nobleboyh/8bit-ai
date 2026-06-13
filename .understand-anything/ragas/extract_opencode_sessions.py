@@ -469,50 +469,30 @@ def extract_session(session_id: str, session_dir: str | None = None) -> dict[str
 # ── Run evaluation pipeline ───────────────────────────────────────────
 
 def run_evaluation(cases_path: Path, output_dir: Path):
-    """Run evaluate_deepseek_ragas.py then generate_compare_html.py."""
+    """Run evaluate_deepseek_ragas.py (auto-generates HTML report)."""
     os.environ.setdefault("DEEPSEEK_API_KEY", "")
     if not os.environ.get("DEEPSEEK_API_KEY"):
         print("Warning: DEEPSEEK_API_KEY is not set. Evaluation will fail.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     results_path = output_dir / "ragas_results.json"
-    html_path = output_dir / "compare_results.html"
 
-    # Step 1: Evaluate with RAGAS
     print(f"\n{'='*60}")
-    print(f"Step 1: RAGAS evaluation")
+    print(f"RAGAS evaluation")
     print(f"  Input:  {cases_path}")
     print(f"  Output: {results_path}")
+    print(f"  HTML:   {results_path.with_suffix('.html')}")
     print(f"{'='*60}")
     eval_script = RAGAS_DIR / "evaluate_deepseek_ragas.py"
     result = subprocess.run(
         [sys.executable, str(eval_script), "--input", str(cases_path), "--output", str(results_path)],
         capture_output=False,
     )
-    if result.returncode != 0:
-        print(f"RAGAS evaluation failed (exit code {result.returncode})")
-        return
-
-    # Step 2: Generate HTML comparison
-    print(f"\n{'='*60}")
-    print(f"Step 2: Generate HTML comparison report")
-    print(f"  Output: {html_path}")
-    print(f"{'='*60}")
-    html_script = RAGAS_DIR / "generate_compare_html.py"
-    result = subprocess.run(
-        [
-            sys.executable, str(html_script),
-            "--tasks", str(cases_path),
-            "--scores", str(results_path),
-            "--output", str(html_path),
-        ],
-        capture_output=False,
-    )
     if result.returncode == 0:
         print(f"\nDone! Open the report:")
-        print(f"  open {html_path}")
+        print(f"  open {results_path.with_suffix('.html')}")
     else:
-        print(f"HTML generation failed (exit code {result.returncode})")
+        print(f"Evaluation failed (exit code {result.returncode})")
 
 
 # ── CLI ───────────────────────────────────────────────────────────────

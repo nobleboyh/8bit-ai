@@ -17,12 +17,7 @@ generate_deepseek_tasks.py  ───►  deepseek_tasks_output.json
                               evaluate_deepseek_ragas.py
                                        │
                                        ▼
-                              deepseek_ragas_results.json
-                                       │
-                              generate_compare_html.py
-                                       │
-                                       ▼
-                              compare_results.html
+                              deepseek_ragas_results.json  +  .html
 ```
 
 ### 1. Generate — `generate_deepseek_tasks.py`
@@ -47,13 +42,7 @@ Scores each `(question, response, context, reference)` quadruple with RAGAS:
 | Context Recall | Were all relevant context chunks retrieved? | ≥ 0.50 |
 | Answer Relevancy | How relevant is the response to the question? | ≥ 0.70 |
 
-Output: `deepseek_ragas_results.json` + auto-generated HTML report (optional)
-
-### 3. Compare — `generate_compare_html.py`
-
-Produces a dark-themed HTML dashboard that shows `with_kg` vs `with_source`
-scores side-by-side, per-task response comparisons, token usage, and
-category breakdowns.
+Output: `deepseek_ragas_results.json` + auto-generated HTML report.
 
 ---
 
@@ -67,7 +56,7 @@ pip install openai ragas
 
 Requires a DeepSeek API key (or any OpenAI-compatible endpoint).
 
-### Full pipeline (generate → evaluate → compare)
+### Full pipeline (generate → evaluate)
 
 ```bash
 cd pixelforge
@@ -79,29 +68,16 @@ export DEEPSEEK_API_KEY="sk-..."
 python3.12 .understand-anything/ragas/generate_deepseek_tasks.py
 python3.12 .understand-anything/ragas/generate_deepseek_tasks.py --sample 2
 
-# 3. Evaluate with RAGAS
-python3.12 .understand-anything/ragas/evaluate_deepseek_ragas.py \
-    --input .understand-anything/ragas/deepseek_tasks_output.json
-
-# 4. Generate comparison HTML
-python3.12 .understand-anything/ragas/generate_compare_html.py \
-    --tasks .understand-anything/ragas/deepseek_tasks_output.json \
-    --scores .understand-anything/ragas/deepseek_ragas_results.json
-```
-
-### Step 2: Evaluate only (if responses already generated)
-
-```bash
+# 3. Evaluate with RAGAS (auto-generates HTML report)
 python3.12 .understand-anything/ragas/evaluate_deepseek_ragas.py \
     --input .understand-anything/ragas/deepseek_tasks_output.json
 ```
 
-### Step 3: Compare only (if evaluation already done)
+### Evaluate only (if responses already generated)
 
 ```bash
-python3.12 .understand-anything/ragas/generate_compare_html.py \
-    --tasks .understand-anything/ragas/deepseek_tasks_output.json \
-    --scores .understand-anything/ragas/deepseek_ragas_results.json
+python3.12 .understand-anything/ragas/evaluate_deepseek_ragas.py \
+    --input .understand-anything/ragas/deepseek_tasks_output.json
 ```
 
 ---
@@ -150,9 +126,7 @@ const IDs from the knowledge graph).
   ragas/
     README.md
     generate_deepseek_tasks.py     ← step 1: generate responses
-    evaluate_deepseek_ragas.py     ← step 2: RAGAS scoring
-    generate_compare_html.py       ← step 3: comparison dashboard
-    compare_results.html           ← generated HTML report
+    evaluate_deepseek_ragas.py     ← step 2: RAGAS scoring + HTML report
 ```
 
 Output files (`deepseek_tasks_output.json`, `deepseek_ragas_results.json`,
@@ -168,5 +142,5 @@ Output files (`deepseek_tasks_output.json`, `deepseek_ragas_results.json`,
 - **Context Precision** and **Context Recall** reflect whether the right files
   were included in the KG context for each task.
 - **Answer Relevancy** requires an embedding model; it's optional.
-- The comparison HTML highlights per-metric deltas (`with_kg - with_source`).
-  Green deltas mean KG helped; red means it hurt.
+- The HTML report shows per-metric scores, per-case breakdowns with response
+  and reference views, and category filters.

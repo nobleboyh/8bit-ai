@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RAGAS Evaluation Results — 2 case(s)</title>
+<style>
+
+:root {
+  --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
+  --border: #30363d; --green: #3fb950; --yellow: #d29922;
+  --red: #f85149; --text: #e6edf3; --text-dim: #8b949e;
+  --accent: #f78166; --radius: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text);
+  padding: 24px; line-height: 1.6; max-width: 1000px; margin: 0 auto;
+}
+h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; }
+.subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px; }
+h2 { font-size: 1.1rem; font-weight: 600; margin: 28px 0 14px; }
+.stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 18px; flex: 1; min-width: 120px;
+}
+.stat-card .label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.4px; margin-bottom: 6px; }
+.stat-card .value { font-size: 1.4rem; font-weight: 700; }
+.value.green { color: var(--green); }
+.value.yellow { color: var(--yellow); }
+.value.red { color: var(--red); }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.metric-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px;
+}
+.metric-card .label { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 6px; }
+.metric-card .score { font-size: 1.25rem; font-weight: 700; }
+.token-section {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 18px; margin-bottom: 24px;
+}
+.token-section h3 { font-size: 0.85rem; margin-bottom: 10px; }
+.token-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+.token-item { display: flex; flex-direction: column; gap: 2px; }
+.token-item .tl { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.4px; }
+.token-item .tv { font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.token-item .tv.total { color: var(--accent); }
+.category-table {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 24px;
+}
+.category-table table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.category-table th, .category-table td { padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+.category-table th { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.4px; font-weight: 600; background: var(--surface2); }
+.task-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 10px; overflow: hidden;
+}
+.task-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer; user-select: none;
+}
+.task-header:hover { background: rgba(255,255,255,0.02); }
+.task-header .toggle { color: var(--text-dim); font-size: 0.75rem; width: 18px; text-align: center; flex-shrink: 0; }
+.task-header .num { font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0; min-width: 28px; }
+.task-header .cat {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.4px;
+  background: var(--surface2); padding: 2px 7px; border-radius: 4px;
+  color: var(--text-dim); flex-shrink: 0;
+}
+.task-header .q { flex: 1; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-header .mini-scores { display: flex; gap: 10px; font-size: 0.7rem; flex-shrink: 0; }
+.task-header .mini-scores .ms { text-align: center; min-width: 48px; }
+.task-header .mini-scores .ms .mv { font-weight: 600; }
+.score-green { color: var(--green); font-weight: 600; }
+.score-yellow { color: var(--yellow); font-weight: 600; }
+.score-red { color: var(--red); font-weight: 600; }
+.task-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.task-body.open { display: block; }
+.score-summary { display: flex; gap: 20px; flex-wrap: wrap; padding: 12px 0; font-size: 0.82rem; }
+.score-summary .ss-item { display: flex; flex-direction: column; gap: 2px; }
+.score-summary .ss-item .ss-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; }
+.resp-box {
+  background: #0d1117; border-radius: 6px; padding: 12px;
+  font-size: 0.74rem; max-height: 360px; overflow-y: auto;
+  white-space: pre-wrap; font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace;
+  line-height: 1.45; margin-top: 8px; border-left: 3px solid var(--green);
+}
+.resp-box .label { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif; font-weight: 600; }
+.ref-box {
+  background: #0d1b2a; border: 1px solid #1a3a2a; border-radius: 6px; padding: 12px;
+  font-size: 0.74rem; margin-top: 10px; white-space: pre-wrap;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace; line-height: 1.45;
+}
+.ref-box .label { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif; font-weight: 600; }
+.filter-bar {
+  display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.filter-btn {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 5px 13px; font-size: 0.72rem; color: var(--text); cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--accent); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-btn.active.all { background: var(--accent); border-color: var(--accent); }
+.bar-bg { display: inline-block; width: 50px; height: 10px; background: var(--surface2); border-radius: 3px; vertical-align: middle; margin-right: 6px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; min-width: 2px; background: var(--green); }
+.bar-fill.yellow { background: var(--yellow); }
+.bar-fill.red { background: var(--red); }
+.text-dim { color: var(--text-dim); }
+.text-sm { font-size: 0.75rem; }
+
+</style></head><body>
+<h1>RAGAS Evaluation Results</h1>
+<div class="subtitle">2 case(s) from opencode_ragas_cases.json</div>
+<div class="stats-row">
+<div class="stat-card"><div class="label">Total Cases</div><div class="value">2</div></div>
+<div class="stat-card"><div class="label">Total Tokens</div><div class="value">45,323</div></div>
+</div>
+<h2>Metric Averages</h2>
+<div class="metric-grid">
+<div class="metric-card"><div class="label">Faithfulness</div><div class="score yellow">46.4%</div></div>
+</div>
+<h2>Token Usage</h2>
+<div class="token-section">
+<div class="token-grid">
+<div class="token-item"><span class="tv total">29,481</span><span class="tl">prompt_tokens</span></div>
+<div class="token-item"><span class="tv total">15,842</span><span class="tl">completion_tokens</span></div>
+<div class="token-item"><span class="tv total">45,323</span><span class="tl">total_tokens</span></div>
+</div></div>
+<h2>Case Details</h2>
+<div class="task-card" data-category="complex">
+<div class="task-header" onclick="toggleTask(this)">
+<span class="toggle">&#x25b6;</span>
+<span class="num">1</span>
+<span class="cat">complex</span>
+<span class="q">Design a client-side response caching layer that caches LLM responses by prompt+type hash to avoid re-generating identical avatars. Describe cache invalidation, storage limits, and</span>
+<span class="mini-scores">
+<span class="ms"><span class="mv score-red">0.000</span><br><span class="text-dim text-sm">faithfulness</span></span>
+</span></div>
+<div class="task-body">
+<div class="score-summary">
+<div class="ss-item"><span class="ss-label">Faithfulness</span><span style="font-size:1.1em;font-weight:700;color:var(--red)">0.000</span></div>
+</div>
+<div style="margin-bottom:10px">
+<div style="display:flex;align-items:center;gap:8px;font-size:0.72rem;margin-bottom:4px">
+<span style="min-width:100px;color:var(--text-dim)">Faithfulness</span>
+<span class="bar-bg"><span class="bar-fill red" style="width:0%"></span></span>
+<span class="score-red" style="min-width:50px">0.000</span>
+</div>
+</div>
+<div class="resp-box"><span class="label">Response</span>## Cache Layer Design
+
+The existing `src/utils/generationCache.ts` provides a solid foundation but needs upgrades for persistence and robustness. Here's the full design:
+
+---
+
+### Cache Key
+
+`SHA-256(prompt + '|' + type)` — hashing prevents oversized keys in storage, and excludes mutable config (apiUrl, model, apiKey) since those don't affect the response *content*, only *delivery*. Two-tier key resolution:
+
+1. **Primary key** (fast lookup): `hash` → cached response
+2. **Secondary index** (inval</div>
+</div></div>
+<div class="task-card" data-category="complex">
+<div class="task-header" onclick="toggleTask(this)">
+<span class="toggle">&#x25b6;</span>
+<span class="num">2</span>
+<span class="cat">complex</span>
+<span class="q">Explore the codebase at /Users/tritran/8bit-ai thoroughly. I need to understand:
+1. What kind of app this is (framework, bundler, etc.)
+2. How LLM/API calls are currently made — se</span>
+<span class="mini-scores">
+<span class="ms"><span class="mv score-green">0.929</span><br><span class="text-dim text-sm">faithfulness</span></span>
+</span></div>
+<div class="task-body">
+<div class="score-summary">
+<div class="ss-item"><span class="ss-label">Faithfulness</span><span style="font-size:1.1em;font-weight:700;color:var(--green)">0.929</span></div>
+</div>
+<div style="margin-bottom:10px">
+<div style="display:flex;align-items:center;gap:8px;font-size:0.72rem;margin-bottom:4px">
+<span style="min-width:100px;color:var(--text-dim)">Faithfulness</span>
+<span class="bar-bg"><span class="bar-fill green" style="width:93%"></span></span>
+<span class="score-green" style="min-width:50px">0.929</span>
+</div>
+</div>
+<div class="resp-box"><span class="label">Response</span>I'll systematically explore the codebase. Let me start with multiple parallel searches to understand the project.
+Now let me read the key files in parallel to understand the project:
+Now let me read the provider implementations and remaining key files:
+Let me read the remaining hooks and key component files:
+Let me grab the remaining utility files and config files:
+Now let me check if there are any other relevant files I might have missed:
+Here is the comprehensive analysis of the **PixelForge**</div>
+</div></div>
+<script>
+
+function toggleTask(header) {
+  var body = header.nextElementSibling;
+  var toggle = header.querySelector('.toggle');
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    toggle.textContent = '\u25b6';
+  } else {
+    body.classList.add('open');
+    toggle.textContent = '\u25bc';
+  }
+}
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var filter = this.getAttribute('data-filter');
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelectorAll('.task-card').forEach(function(card) {
+      if (filter === 'all') {
+        card.style.display = '';
+      } else {
+        card.style.display = card.getAttribute('data-category') === filter ? '' : 'none';
+      }
+    });
+  });
+});
+
+</script>
+</body></html>

@@ -119,6 +119,7 @@ This computes:
 An HTML report is auto-generated alongside the JSON results at
 `results.html` (same path as `--output` with `.html` extension). Pass
 `--report report.html` to set a custom path, or `--report ''` to skip.
+No separate `generate_compare_html.py` step is needed.
 
 ### All-in-one: extract → evaluate → HTML
 
